@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.login_activity.fragments.ArtistQuestionsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- <ImageView
+             android:id="@+id/btn_back_detect_registeration_fragment"
+             android:layout_width="38dp"
+             android:layout_height="38dp"
+             android:layout_marginEnd="16dp"
+             android:layout_marginStart="16dp"
+             android:layout_marginTop="16dp"
+             android:background="@drawable/round_button"
+             android:padding="9dp"
+             android:src="@drawable/ic__back"
+
+             />-->
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/nav_header_rider_avatar"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:src="@color/blue"
+            app:srcCompat="@mipmap/ic_launcher_round" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="30dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingBottom="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="0dp"
+                    android:paddingTop="5dp"
+                    android:text="Average of orders youc ould have"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.shawnlin.numberpicker.NumberPicker
+                    android:id="@+id/number_picker"
+                    android:layout_width="150dp"
+                    android:layout_height="45dp"
+                    android:background="@drawable/dark_burble_button_background"
+                    app:np_dividerColor="#00000000"
+                    app:np_max="20"
+                    app:np_min="0"
+                    app:np_orientation="horizontal"
+                    app:np_selectedTextColor="@android:color/white"
+                    app:np_selectedTextSize="20dp"
+                    app:np_textColor="@color/colorPrimary"
+                    app:np_textSize="15dp"
+                    app:np_value="1"
+
+                    />
+            </LinearLayout>
+            <!--app:np_orientation="horizontal"-->
+            <!--app:np_height="50dp" app:np_width="100dp"-->
+            <!--app:np_typeface="@string/roboto_light"-->
+            <!--app:np_formatter="@string/number_picker_formatter"-->
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:alpha=".5"
+                android:background="@color/dark_burble" />
+
+            <Button
+                android:id="@+id/city_artist_questions_fragment_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/dark_burble_button_background"
+                android:text="Your City"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/finish_artist_questions_fragment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradient_button_background_no_corners"
+            android:text="Finish"
+            android:textColor="@android:color/white" />
+        <!--android:layout_marginBottom="7dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"-->
+
+    </LinearLayout>
+
+
+</FrameLayout>

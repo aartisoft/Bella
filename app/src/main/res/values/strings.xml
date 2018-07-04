@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">Bella</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_search">Search</string>
+    <string name="my_main_prefrence">com.spots.bella</string>
+    <string name="wizard_shown_key">wizard_shown</string>
+    <string name="wizard_content_1">The right way to care for beauty and elegence here in Bella we offer everything about beauty...</string>
+    <string name="wizard_content_2">The right way to care for beauty and elegence here in Bella we offer everything about beauty...</string>
+    <string name="wizard_content_3">The right way to care for beauty and elegence here in Bella we offer everything about beauty...</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_fragment_tag">login_fragment</string>
+    <string name="detect_registeration_fragment">detect_registeration</string>
+    <string name="user_registeration_fragment_tag">user_registeration_fragment</string>
+
+  <!--  <string-array name="governoments">
+        <item>الإسكندرية</item>
+        <item>الإسماعيلية</item>
+        <item>أسوان</item>
+        <item>أسيوط</item>
+        <item>الأقصر</item>
+        <item>البحر الأحمر</item>
+        <item>البحيرة</item>
+        <item>بني سويف</item>
+        <item>بورسعيد</item>
+        <item>جنوب سيناء</item>
+        <item>الجيزة</item>
+        <item>الدقهلية</item>
+        <item>دمياط</item>
+        <item>سوهاج</item>
+        <item>السويس</item>
+        <item>الشرقية</item>
+        <item>شمال سيناء</item>
+        <item>الغربية</item>
+        <item>الفيوم</item>
+        <item>القاهرة</item>
+        <item>القليوبية</item>
+        <item>قنا</item>
+        <item>كفر الشيخ</item>
+        <item>مطروح</item>
+        <item>المنوفية</item>
+        <item>المنيا</item>
+        <item>الوادي الجديد</item>
+    </string-array>-->
+
+    <string-array name="governoments">
+        <item>Alexandria</item>
+        <item>Aswan</item>
+        <item>Asyut</item>
+        <item>Beheira</item>
+        <item>Beni Suef</item>
+        <item>Cairo</item>
+        <item>Dakahlia</item>
+        <item>Damietta</item>
+        <item>Faiyum</item>
+        <item>Gharbia</item>
+        <item>Giza</item>
+        <item>Ismailia</item>
+        <item>Kafr El Sheikh</item>
+        <item>Luxor</item>
+        <item>Matruh</item>
+        <item>Minya</item>
+        <item>Monufia</item>
+        <item>New Valley</item>
+        <item>North Sinai</item>
+        <item>Port Said</item>
+        <item>Qalyubia</item>
+        <item>Qena</item>
+        <item>Red Sea</item>
+        <item>Sharqia</item>
+        <item>Sohag</item>
+        <item>South Sinai</item>
+        <item>Suez</item>
+    </string-array>
+
+</resources>
