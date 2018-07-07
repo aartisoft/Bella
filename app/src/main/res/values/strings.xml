@@ -31,8 +31,11 @@
     <string name="login_fragment_tag">login_fragment</string>
     <string name="detect_registeration_fragment">detect_registeration</string>
     <string name="user_registeration_fragment_tag">user_registeration_fragment</string>
+    <string name="forgot_password_fragment_tag">forgot_password_fragment</string>
+    <string name="confirm_code_fragment_tag">confirm_code_fragment</string>
+    <string name="reset_password_fragment_tag">reset_password_fragment</string>
 
-  <!--  <string-array name="governoments">
+    <!--  <string-array name="governoments">
         <item>الإسكندرية</item>
         <item>الإسماعيلية</item>
         <item>أسوان</item>

@@ -1,7 +1,11 @@
 package com.spots.bella.constants;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.app.FragmentManager;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,4 +28,20 @@ public class Common {
         }
     }
 
+    public static int convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return (int) px;
+    }
+
+    public static boolean isValidEmail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public static void clearBackStackFragments(FragmentManager supportFragmentManager) {
+        while (supportFragmentManager.getBackStackEntryCount() > 0) {
+            supportFragmentManager.popBackStackImmediate();
+        }
+    }
 }

@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.WizardActivity"
+            android:name=".activity.login_activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -30,7 +30,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.login_activity.LoginActivity"
+            android:name=".activity.WizardActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
     </application>

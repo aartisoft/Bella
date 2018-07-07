@@ -86,11 +86,6 @@ public class RegisterationFragment extends Fragment implements OnKeyboardVisibil
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         setKeyboardVisibilityListener(null);
@@ -116,7 +111,6 @@ public class RegisterationFragment extends Fragment implements OnKeyboardVisibil
 
         void onRegisterNextBtnClicked(int TYPE);
     }
-
 
     private void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
         final View parentView = ((ViewGroup) getActivity().findViewById(android.R.id.content)).getChildAt(0);

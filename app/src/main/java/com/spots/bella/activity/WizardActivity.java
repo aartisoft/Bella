@@ -13,22 +13,34 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
 import com.spots.bella.adapters.WizaredSliderAdapter;
 
-public class WizardActivity extends AppCompatActivity implements View.OnClickListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-    private ViewPager mPager;
+public class WizardActivity extends AppCompatActivity {
+
+    @BindView(R.id.slider_view_pager)
+    ViewPager mPager;
     private int[] layouts = {R.layout.frist_slide, R.layout.second_slide, R.layout.third_slide};
     private WizaredSliderAdapter mWizaredSliderAdapter;
-    private LinearLayout dots_layout;
+
+    @BindView(R.id.dots_layout)
+    LinearLayout dots_layout;
     private ImageView[] dots;
-    private Button next_btn, skip_btn;
+    @BindView(R.id.next_btn)
+    Button next_btn;
+    @BindView(R.id.skip_btn)
+    Button skip_btn;
     private PreferenceManager pM;
     private boolean isWizard;
+    private boolean isKitkat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +48,7 @@ public class WizardActivity extends AppCompatActivity implements View.OnClickLis
 
         checkAppOpenedBefore();
         setContentView(R.layout.activity_wizard);
+        ButterKnife.bind(this);
         initWizardViews();
     }
 
@@ -57,20 +70,17 @@ public class WizardActivity extends AppCompatActivity implements View.OnClickLis
     private void initWizardViews() {
         if (isWizard) {
             findViewById(R.id.root_wizard_layout).setVisibility(View.VISIBLE);
-            mPager = findViewById(R.id.slider_view_pager);
 //            mPager.setOnTouchListener(new View.OnTouchListener() {
 //                @Override
 //                public boolean onTouch(View v, MotionEvent event) {
 //                    return true;
 //                }
 //            });
+
+
             mWizaredSliderAdapter = new WizaredSliderAdapter(layouts, this);
             mPager.setAdapter(mWizaredSliderAdapter);
-            dots_layout = findViewById(R.id.dots_layout);
-            next_btn = findViewById(R.id.next_btn);
-            skip_btn = findViewById(R.id.skip_btn);
-            next_btn.setOnClickListener(this);
-            skip_btn.setOnClickListener(this);
+
             createDots(mPager.getCurrentItem());
             mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
@@ -119,16 +129,15 @@ public class WizardActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.next_btn:
-                load_next_slide_click();
-                break;
-            case R.id.skip_btn:
-                loadLoginRegister();
-                break;
-        }
+
+    @OnClick(R.id.next_btn)
+    public void next() {
+        load_next_slide_click();
+    }
+
+    @OnClick(R.id.skip_btn)
+    public void skip() {
+        loadLoginRegister();
     }
 
     private void load_next_slide_click() {

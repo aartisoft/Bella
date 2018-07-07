@@ -1,15 +1,13 @@
 package com.spots.bella.activity.login_activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,18 +18,32 @@ import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.spots.bella.R;
 import com.spots.bella.activity.WizardActivity;
 import com.spots.bella.activity.login_activity.fragments.ArtistQuestionsFragment;
+import com.spots.bella.activity.login_activity.fragments.ConfirmCodeFragment;
+import com.spots.bella.activity.login_activity.fragments.ConfirmCodeFragment.OnConfirmCodeFragmentInteractionListener;
 import com.spots.bella.activity.login_activity.fragments.DetectRegisterationFragment;
+import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment;
+import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment.OnForgotPasswordFragmentInteractionListener;
 import com.spots.bella.activity.login_activity.fragments.LoginFragment;
 import com.spots.bella.activity.login_activity.fragments.RegisterationFragment;
+import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment;
+import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment.OnResetPasswordFragmentInteractionListener;
+import com.spots.bella.constants.Common;
 
+import static com.spots.bella.activity.login_activity.fragments.ArtistQuestionsFragment.*;
+import static com.spots.bella.activity.login_activity.fragments.DetectRegisterationFragment.*;
+import static com.spots.bella.activity.login_activity.fragments.LoginFragment.*;
+import static com.spots.bella.activity.login_activity.fragments.RegisterationFragment.*;
 import static com.spots.bella.constants.Common.NORMAL_USER;
 import static com.spots.bella.constants.Common.darkStatusBarSetup;
 
 public class LoginActivity extends AppCompatActivity implements
-        LoginFragment.OnLoginFragmentInteractionListener,
-        DetectRegisterationFragment.OnDetectRegisterationFragmentInteractionListener,
-        ArtistQuestionsFragment.OnArtistQuestionsFragmentInteractionListener,
-        RegisterationFragment.OnRegisterFragmentInteractionListener {
+        OnLoginFragmentInteractionListener,
+        OnDetectRegisterationFragmentInteractionListener,
+        OnArtistQuestionsFragmentInteractionListener,
+        OnForgotPasswordFragmentInteractionListener,
+        OnConfirmCodeFragmentInteractionListener,
+        OnResetPasswordFragmentInteractionListener,
+        OnRegisterFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +92,14 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     public void onForgotPasswordBtnClicked() {
-        Toast.makeText(this, "Design not ready!", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onForgotPasswordBtnClicked: ");
+        showForgotPasswordFragment();
+    }
+
+    private void showForgotPasswordFragment() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.root_login_activity_container, new ForgotPasswordFragment(), getResources().getString(R.string.forgot_password_fragment_tag));
+        fragmentTransaction.addToBackStack(null).commit();
     }
 
     private void showDetectRegisterationFragment() {
@@ -89,7 +108,6 @@ public class LoginActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.root_login_activity_container, new DetectRegisterationFragment(), getResources().getString(R.string.detect_registeration_fragment));
         fragmentTransaction.addToBackStack(null).commit();
     }
-
 
     @Override
     public void onDetectRegisterationFragmentOpened() {
@@ -180,9 +198,7 @@ public class LoginActivity extends AppCompatActivity implements
                     dialog.cancel();
                 }
                 Toast.makeText(LoginActivity.this, "Registration Success...", Toast.LENGTH_SHORT).show();
-                while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    getSupportFragmentManager().popBackStackImmediate();
-                }
+                Common.clearBackStackFragments(getSupportFragmentManager());
                 showLoginFragment();
             }
         }, 3000);
@@ -191,131 +207,129 @@ public class LoginActivity extends AppCompatActivity implements
     AlertDialog dialog;
 
     private void showDialog() {
-//        @BindView(R.id.progress)
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        dialog.setTitle("Title");
-//        dialog.setMessage("Message");
         LayoutInflater inflater = LayoutInflater.from(LoginActivity.this);
         View sign_in_layout = inflater.inflate(R.layout.sign_in_layout, null);
         ProgressBar progressBar = sign_in_layout.findViewById(R.id.progress);
         DoubleBounce doubleBounce = new DoubleBounce();
         doubleBounce.setBounds(0, 0, 100, 100);
-//        doubleBounce.setColor(getResources().getColor(R.color.white));
         doubleBounce.setColor(Color.WHITE);
         progressBar.setIndeterminateDrawable(doubleBounce);
         dialog.setView(sign_in_layout);
         dialog.setCancelable(false);
-        /*dialog.setCanceledOnTouchOutside(false);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Log.d(TAG, "onCancel: ");
-            }
-        });*/
-//        dialog.setPositiveButton("SIGN IN", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(final DialogInterface dialogInterface, int i) {
-//
-//
-//            }
-//        });
-//        dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                dialogInterface.dismiss();
-//            }
-//        });
+
         dialog.show();
     }
 
-    //    private void hideToolbar() {
-//        toolbar.setVisibility(View.GONE);
-//    }
-//
-//    private void hideToolbarBack() {
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//            getSupportActionBar().setHomeButtonEnabled(false);
-//        }
-//    }
+    @Override
+    public void onForgotPasswordFragmentOpened() {
+        Log.d(TAG, "onForgotPasswordFragmentOpened: ");
+    }
 
-//    private void showToolbarBack() {
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setHomeButtonEnabled(true);
-//        }
-//    }
-//
-//    private void showToolbar() {
-//        toolbar.setVisibility(View.VISIBLE);
-//    }
-//    public void enableBackButton(boolean enable) {
-//        // To keep states of ActionBar and ActionBarDrawerToggle synchronized,
-//        // when you enable on one, you disable on the other.
-//        // And as you may notice, the order for this operation is disable first, then enable - VERY VERY IMPORTANT.
-//        if (enable) {
-//            // Remove hamburger
-//            mDrawerToggle.setDrawerIndicatorEnabled(false);
-//            // Show back button
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            // when DrawerToggle is disabled i.e. setDrawerIndicatorEnabled(false), navigation icon
-//            // clicks are disabled i.e. the UP button will not work.
-//            // We need to add a listener, as in below, so DrawerToggle will forward
-//            // click events to this listener.
-//            if (!mToolBarNavigationListenerIsRegistered) {
-//                mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        // Doesn't have to be onBackPressed
-//                        onBackPressed();
-//                    }
-//                });
-//
-//                mToolBarNavigationListenerIsRegistered = true;
-//                mSetting.saveToolbarNavigationState(mToolBarNavigationListenerIsRegistered);
-//            }
-//
-//        } else {
-//            // Remove back button
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//            // Show hamburger
-//            mDrawerToggle.setDrawerIndicatorEnabled(true);
-//            // Remove the/any drawer toggle listener
-//            mDrawerToggle.setToolbarNavigationClickListener(null);
-//            mToolBarNavigationListenerIsRegistered = false;
-//            mSetting.saveToolbarNavigationState(mToolBarNavigationListenerIsRegistered);
-//        }
-//
-//        // So, one may think "Hmm why not simplify to:
-//        // .....
-//        // getSupportActionBar().setDisplayHomeAsUpEnabled(enable);
-//        // mDrawer.setDrawerIndicatorEnabled(!enable);
-//        // ......
-//        // To re-iterate, the order in which you enable and disable views IS important #dontSimplify.
-//    }
+    @Override
+    public void onForgotPasswordAlreadyHaveAccountClicked() {
+        Log.d(TAG, "onForgotPasswordAlreadyHaveAccountClicked: ");
+        onBackPressed();
+    }
 
+    @Override
+    public void onForgotPasswordNextClicked(final String email) {
+        Log.d(TAG, "onForgotPasswordNextClicked: ");
+        sendResetPasswordEmail(email);
+    }
 
-//        et_login_fragment_password.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                final int DRAWABLE_LEFT = 0;
-//                final int DRAWABLE_TOP = 1;
-//                final int DRAWABLE_RIGHT = 2;
-//                final int DRAWABLE_BOTTOM = 3;
-//
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (et_login_fragment_password.getRight() - et_login_fragment_password.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-//                        // your action here
-//                        et_login_fragment_password.requestFocus();
-//                        /*et_login_fragment_password.setInputType(InputType.TYPE_CLASS_TEXT |
-//                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                        et_login_fragment_password.setSelection(et_login_fragment_password.getText().length());
-//                      */  return true;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
+    private void showConfirmationCodeFragment(String email) {
+        ConfirmCodeFragment fragment = new ConfirmCodeFragment();
+        Bundle b = new Bundle();
+        b.putString("email", email);
+        fragment.setArguments(b);
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.root_login_activity_container, fragment, getResources().getString(R.string.confirm_code_fragment_tag));
+        fragmentTransaction.addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onConfirmCodeOpened() {
+        Log.d(TAG, "onConfirmCodeOpened: ");
+    }
+
+    @Override
+    public void onResendCodeClicked(String email) {
+        Log.d(TAG, "onResendCodeClicked: ");
+        sendResetPasswordEmail(email);
+    }
+
+    @Override
+    public void onConfirmCodeNextClicked(String code, String email) {
+        Log.d(TAG, "onConfirmCodeNextClicked: ");
+        checkValidation(code, email);
+    }
+
+    private void checkValidation(String code, final String email) {
+        showDialog();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null) {
+                    // empty fields
+                    dialog.cancel();
+                }
+                // show next level
+                showResetPasswordFragment(email);
+            }
+        }, 3000);
+    }
+
+    private void showResetPasswordFragment(String email) {
+        Log.d(TAG, "showResetPasswordFragment: ");
+        ResetPasswordFragment fragment = new ResetPasswordFragment();
+        Bundle b = new Bundle();
+        b.putString("email", email);
+        fragment.setArguments(b);
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.root_login_activity_container, fragment, getResources().getString(R.string.reset_password_fragment_tag));
+        fragmentTransaction.addToBackStack(null).commit();
+    }
+
+    private void sendResetPasswordEmail(final String email) {
+        Log.d(TAG, "sendResetPasswordEmail: ");
+        showDialog();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null) {
+                    // empty fields
+                    dialog.cancel();
+                }
+                Toast.makeText(LoginActivity.this, "Confirmation code sent to your e-mail.", Toast.LENGTH_SHORT).show();
+                showConfirmationCodeFragment(email);
+            }
+        }, 3000);
+    }
+
+    @Override
+    public void onResetPasswordFragmentOpened() {
+        Log.d(TAG, "onResetPasswordFragmentOpened: ");
+    }
+
+    @Override
+    public void onSaveNewPasswordClicked() {
+        Log.d(TAG, "onSaveNewPasswordClicked: ");
+        showDialog();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null) {
+                    dialog.cancel();
+                }
+                Toast.makeText(LoginActivity.this, "Password Changes Successfully", Toast.LENGTH_SHORT).show();
+                Common.clearBackStackFragments(getSupportFragmentManager());
+                showLoginFragment();
+            }
+        }, 3000);
+    }
 }
