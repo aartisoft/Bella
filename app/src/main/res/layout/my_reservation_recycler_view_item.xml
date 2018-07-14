@@ -59,27 +59,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                >
+                android:gravity="center"
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:layout_marginTop="2dp"
                     android:layout_weight="1"
                     android:text="Tanta, Egypt"
                     android:textSize="13dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:text="10:15 - 11:45"
-                    android:textSize="13dp"
-
+                    android:background="@drawable/bg2"
+                    android:gravity="center"
+                    android:text="+2"
+                    android:textSize="12dp"
+                    android:textColor="@android:color/white"
                     />
 
 
@@ -93,18 +93,16 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:text="15 Tahrir Square"
-                android:textSize="15dp"
-                android:layout_marginTop="5dp"
-                />
+                android:textSize="15dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                >
+                android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="35dp"
