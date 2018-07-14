@@ -34,6 +34,13 @@
     <string name="forgot_password_fragment_tag">forgot_password_fragment</string>
     <string name="confirm_code_fragment_tag">confirm_code_fragment</string>
     <string name="reset_password_fragment_tag">reset_password_fragment</string>
+    <string name="messages">Messages</string>
+    <string name="main_messages_fragment_tag">main_messages_fragment</string>
+
+    <string name="app_font_type">fonts/clan_ot_book_font.ttf</string>
+
+    <string name="my_reservation">My Reservation</string>
+    <string name="main_reservations_fragment_tag">main_reservations_fragment</string>
 
     <!--  <string-array name="governoments">
         <item>الإسكندرية</item>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="time_drawer_item_clicks_milis">300</integer>
+</resources>

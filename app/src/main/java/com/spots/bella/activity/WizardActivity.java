@@ -6,26 +6,28 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
+import com.spots.bella.activity.main_activity.MainActivity;
 import com.spots.bella.adapters.WizaredSliderAdapter;
+import com.spots.bella.di.BaseActivity;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class WizardActivity extends AppCompatActivity {
-
+public class WizardActivity extends BaseActivity {
+    private static final String TAG = "WizardActivity";
     @BindView(R.id.slider_view_pager)
     ViewPager mPager;
     private int[] layouts = {R.layout.frist_slide, R.layout.second_slide, R.layout.third_slide};
@@ -38,9 +40,8 @@ public class WizardActivity extends AppCompatActivity {
     Button next_btn;
     @BindView(R.id.skip_btn)
     Button skip_btn;
-    private PreferenceManager pM;
+
     private boolean isWizard;
-    private boolean isKitkat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +54,8 @@ public class WizardActivity extends AppCompatActivity {
     }
 
     private void checkAppOpenedBefore() {
+        Log.d(TAG, "checkAppOpenedBefore: " + string);
 
-        pM = new PreferenceManager(this);
         pM.clearPrefrences();
 
         if (pM.readSharedPrefrenceBoolean(getString(R.string.wizard_shown_key))) {

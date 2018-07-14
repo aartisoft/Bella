@@ -3,7 +3,6 @@ package com.spots.bella.activity.login_activity.fragments;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,19 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.spots.bella.R;
-import com.spots.bella.activity.OnKeyboardVisibilityListener;
+import com.spots.bella.constants.OnKeyboardVisibilityListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static com.spots.bella.constants.Common.NORMAL_USER;
 
 /**
  * A simple {@link Fragment} subclass.

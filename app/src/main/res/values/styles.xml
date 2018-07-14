@@ -41,4 +41,8 @@
            <item name="colorAccent">@color/dark_burble</item>
            <item name="android:textColorSecondary">@color/dark_burble</item>
        </style>
+
+    <style name="TextAppearance.WeekDay" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">#ffffff</item>
+    </style>
 </resources>

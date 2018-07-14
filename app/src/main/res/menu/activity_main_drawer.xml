@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="none">
         <item
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Test" />
+            android:title="@string/messages"
+            android:id="@+id/drawer_menu_messages"
+            app:actionLayout="@layout/menu_counter"
+            />
         <item
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Test" />
+            android:title="@string/my_reservation"
+            android:id="@+id/drawer_menu_reservation"
+            app:actionLayout="@layout/menu_counter"
+            />
         <item
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Test" />
+            android:title="Map"
+            android:id="@+id/drawer_menu_map"
+            />
+        <item
+            android:title="Setting"
+            android:id="@+id/drawer_menu_setting"
+            />
 
     </group>
-
-    <item android:title="Communicate">
-        <item
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Test" />
-        <item
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Test" />
-    </item>
 
 </menu>

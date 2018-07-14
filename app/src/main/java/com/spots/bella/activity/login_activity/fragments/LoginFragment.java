@@ -16,7 +16,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import com.spots.bella.R;
-import com.spots.bella.activity.OnKeyboardVisibilityListener;
+import com.spots.bella.constants.OnKeyboardVisibilityListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

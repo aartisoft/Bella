@@ -66,7 +66,7 @@ public class WizaredSliderAdapter extends PagerAdapter {
                 first_card.requestLayout();
 
                 RelativeLayout.MarginLayoutParams params = (RelativeLayout.MarginLayoutParams) iv_1.getLayoutParams();
-                params.setMargins(0, 0, 0, Common.convertDpToPixel(context.getResources().getInteger(R.integer.wizard_image_margin_buttom), context));
+                params.setMargins(0, 0, 0, 0);
                 params.setMarginEnd(0);
                 params.setMarginStart(0);
                 iv_1.requestLayout();
@@ -78,7 +78,7 @@ public class WizaredSliderAdapter extends PagerAdapter {
                 second_card.requestLayout();
 
                 RelativeLayout.MarginLayoutParams params = (RelativeLayout.MarginLayoutParams) iv_2.getLayoutParams();
-                params.setMargins(0, 0, 0, Common.convertDpToPixel(context.getResources().getInteger(R.integer.wizard_image_margin_buttom), context));
+                params.setMargins(0, 0, 0, 0);
                 params.setMarginEnd(0);
                 params.setMarginStart(0);
                 iv_2.requestLayout();
@@ -90,7 +90,7 @@ public class WizaredSliderAdapter extends PagerAdapter {
                 third_card.requestLayout();
 
                 RelativeLayout.MarginLayoutParams params = (RelativeLayout.MarginLayoutParams) iv_3.getLayoutParams();
-                params.setMargins(0, 0, 0, Common.convertDpToPixel(context.getResources().getInteger(R.integer.wizard_image_margin_buttom), context));
+                params.setMargins(0, 0, 0, 0);
                 params.setMarginEnd(0);
                 params.setMarginStart(0);
                 iv_3.requestLayout();
