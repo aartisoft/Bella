@@ -14,15 +14,17 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     MPresenter mPresenter;
     Context context;
+
     public MainRecyclerViewAdapter(Context context, MPresenter mMPresenter) {
         this.context = context;
         this.mPresenter = mMPresenter;
     }
 
     public static class MainRecyclerViewHolder extends RecyclerView.ViewHolder {
-
+        View item;
         public MainRecyclerViewHolder(View itemView) {
             super(itemView);
+            item = itemView;
         }
     }
 
@@ -34,7 +36,12 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
-
+        holder.item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.onItemClicked(context); // add data
+            }
+        });
     }
 
     @Override

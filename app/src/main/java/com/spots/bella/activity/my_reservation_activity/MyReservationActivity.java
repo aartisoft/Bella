@@ -1,5 +1,6 @@
 package com.spots.bella.activity.my_reservation_activity;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -35,15 +36,18 @@ import com.spots.bella.adapters.MainMessagesRecyclerViewAdapter;
 import com.spots.bella.adapters.MyReservationRecyclerViewAdapter;
 import com.spots.bella.di.BaseActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.setTranslucentStatusBar;
@@ -69,7 +73,14 @@ public class MyReservationActivity extends BaseActivity implements OnDateSelecte
     @BindView(R.id.rv_my_reservation)
     RecyclerView rv_my_reservation;
 
+    @BindView(R.id.tv_current_calendar_month_year_date)
+    TextView tv_current_calendar_month_year_date;
+
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +126,11 @@ public class MyReservationActivity extends BaseActivity implements OnDateSelecte
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
                 Date date1 = date.getDate();
-                Log.d(TAG, "onMonthChanged: " + date.getDate().toString());
+                SimpleDateFormat month_date = new SimpleDateFormat("MMM yyyy", Locale.ENGLISH);
+                String month_name = month_date.format(date1);
+                Log.d(TAG, "onMonthChanged: month_name = "+month_name);
+                tv_current_calendar_month_year_date.setText(month_name);
+
             }
         });
         Calendar instance = Calendar.getInstance();

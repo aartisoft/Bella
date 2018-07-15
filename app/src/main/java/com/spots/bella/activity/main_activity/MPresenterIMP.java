@@ -1,5 +1,10 @@
 package com.spots.bella.activity.main_activity;
 
+import android.content.Context;
+import android.content.Intent;
+
+import com.spots.bella.activity.post_activity.PostActivity;
+
 public class MPresenterIMP implements MPresenter, MInteractor.OnDataResponseListener { //TODO: this class links the view and model ((interactor)the business logic )
     private MView mView;
     private MInteractor mInteractor;
@@ -38,6 +43,11 @@ public class MPresenterIMP implements MPresenter, MInteractor.OnDataResponseList
         if (mView != null) {
             mInteractor.fetchData(this);
         }
+    }
+
+    @Override
+    public void onItemClicked(Context context) {
+        context.startActivity(new Intent(context,PostActivity.class));
     }
 
     //TODO: Handle the response

@@ -17,7 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.my_reservation_activity.MyReservationActivity"
+            android:name=".activity.main_activity.MainActivity"
+
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -26,25 +27,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.login_activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.main_activity.MainActivity"
+            android:name=".activity.my_reservation_activity.MyReservationActivity"
+
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activity.messages_activity.MessagesActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activity.WizardActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
+        <activity android:name=".activity.post_activity.PostActivity"></activity>
     </application>
 
 </manifest>
