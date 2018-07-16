@@ -3,7 +3,7 @@ package com.spots.bella.activity.artist_offers_activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,8 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.spots.bella.R;
-import com.spots.bella.activity.messages_activity.MessagesActivity;
+import com.spots.bella.activity.login_activity.fragments.LoginFragment;
+import com.spots.bella.adapters.ArtistOffersViewPagerAdapter;
 import com.spots.bella.di.BaseActivity;
+import com.spots.bella.di.BaseFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,8 +40,14 @@ public class ArtistOffersActivity extends BaseActivity {
 
     @BindView(R.id.artist_offers_toolbar_container)
     LinearLayout toolbar_container;
-    @BindView(R.id.tab_layout)
-    TabLayout tab_layout;
+    @BindView(R.id.tabLayout)
+    TabLayout tabLayout;
+
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
+
+    ArtistOffersViewPagerAdapter viewPagerAdapter;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -63,8 +71,12 @@ public class ArtistOffersActivity extends BaseActivity {
 
     private void initViews() {
         setupToolbar();
-        viewPager.setAdapter(new SectionPagerAdapter(getSupportFragmentManager()));
+        viewPagerAdapter = new ArtistOffersViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFrament(new BaseFragment(), "HOME");
+        viewPagerAdapter.addFrament(new BaseFragment(), "TOP FREE");
+        viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
     }
 
     private void setupToolbar() {
@@ -104,8 +116,10 @@ public class ArtistOffersActivity extends BaseActivity {
                         .data, getResources().getDisplayMetrics());
                 Log.d(TAG, "initViews: action height = " + height);
                 Log.d(TAG, "initViews: status height = " + getStatusBarHeight(context));
+                Log.d(TAG, "initViews: tab height = " +TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,getResources().getDisplayMetrics()));
+
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbar_container.getLayoutParams();
-                params.height = height + getStatusBarHeight(context);
+                params.height = (int) (height + getStatusBarHeight(context) + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,getResources().getDisplayMetrics()));
                 toolbar_container.setLayoutParams(params);
             }
         }
