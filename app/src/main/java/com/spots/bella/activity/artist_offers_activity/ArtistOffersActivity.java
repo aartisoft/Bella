@@ -1,8 +1,8 @@
-package com.spots.bella.activity.messages_activity;
+package com.spots.bella.activity.artist_offers_activity;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -10,13 +10,12 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.spots.bella.R;
-import com.spots.bella.activity.messages_activity.fragments.MainMessagesFragment;
-import com.spots.bella.activity.messages_activity.fragments.MainMessagesFragment.OnMainMessagesFragmentInteractionListener;
+import com.spots.bella.activity.messages_activity.MessagesActivity;
+import com.spots.bella.di.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,20 +26,20 @@ import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.setTranslucentStatusBar;
 import static com.spots.bella.constants.Common.syncToolbar;
 
-public class MessagesActivity extends AppCompatActivity implements
-        OnMainMessagesFragmentInteractionListener {
-    private static final String TAG = "MessagesActivity";
+public class ArtistOffersActivity extends BaseActivity {
 
-    @BindView(R.id.messages_activity_toolbar)
+    private static final String TAG = "ArtistOffersActivity";
+
+    @BindView(R.id.artist_offers_activity_toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.et_toolbar_title)
     TextView toolbar_title;
 
-    @BindView(R.id.messages_toolbar_container)
+    @BindView(R.id.artist_offers_toolbar_container)
     LinearLayout toolbar_container;
-
-
+    @BindView(R.id.tab_layout)
+    TabLayout tab_layout;
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -49,29 +48,23 @@ public class MessagesActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTranslucentStatusBar(MessagesActivity.this);
+        setTranslucentStatusBar(ArtistOffersActivity.this);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/clan_ot_book_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
-        setContentView(R.layout.activity_messages);
+        setContentView(R.layout.activity_artist_offers);
+
 
         ButterKnife.bind(this);
 
         initViews();
-
-        showMainMessagesFragment();
-
-    }
-
-    private void showMainMessagesFragment() {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.messages_activity_container, new MainMessagesFragment(), getResources().getString(R.string.main_messages_fragment_tag));
-        fragmentTransaction.commit();
     }
 
     private void initViews() {
         setupToolbar();
+        viewPager.setAdapter(new SectionPagerAdapter(getSupportFragmentManager()));
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void setupToolbar() {
@@ -81,27 +74,11 @@ public class MessagesActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void setupToolbarContainer() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            TypedValue tv = new TypedValue();
-            if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
-                int height = (int) TypedValue.complexToDimension(tv
-                        .data, getResources().getDisplayMetrics());
-                Log.d(TAG, "initViews: action height = " + height);
-                Log.d(TAG, "initViews: status height = " + getStatusBarHeight(MessagesActivity.this));
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbar_container.getLayoutParams();
-                params.height = height + getStatusBarHeight(MessagesActivity.this);
-                toolbar_container.setLayoutParams(params);
-            }
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        syncToolbar(toolbar_title, Gravity.START, R.string.messages);
+        syncToolbar(toolbar_title, Gravity.START, R.string.artist_offers);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -119,8 +96,18 @@ public class MessagesActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onMainMessagesFragmentOpened() {
-
+    private void setupToolbarContainer() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
+                int height = (int) TypedValue.complexToDimension(tv
+                        .data, getResources().getDisplayMetrics());
+                Log.d(TAG, "initViews: action height = " + height);
+                Log.d(TAG, "initViews: status height = " + getStatusBarHeight(context));
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbar_container.getLayoutParams();
+                params.height = height + getStatusBarHeight(context);
+                toolbar_container.setLayoutParams(params);
+            }
+        }
     }
 }
