@@ -9,11 +9,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.spots.bella.R;
+import com.spots.bella.activity.artist_offers_activity.fragments.FavouriteArtistOffersFragment;
+import com.spots.bella.activity.artist_offers_activity.fragments.FavouriteArtistOffersFragment.OnFavouriteArtistFragmentInteractionListener;
+import com.spots.bella.activity.artist_offers_activity.fragments.LatestArtistOffersFragment;
 import com.spots.bella.activity.login_activity.fragments.LoginFragment;
 import com.spots.bella.adapters.ArtistOffersViewPagerAdapter;
 import com.spots.bella.di.BaseActivity;
@@ -24,11 +29,14 @@ import butterknife.ButterKnife;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static com.spots.bella.activity.artist_offers_activity.fragments.LatestArtistOffersFragment.*;
 import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.setTranslucentStatusBar;
 import static com.spots.bella.constants.Common.syncToolbar;
 
-public class ArtistOffersActivity extends BaseActivity {
+public class ArtistOffersActivity extends BaseActivity implements
+        OnLatestArtistOffersFragmentInteractionListener,
+        OnFavouriteArtistFragmentInteractionListener {
 
     private static final String TAG = "ArtistOffersActivity";
 
@@ -72,8 +80,8 @@ public class ArtistOffersActivity extends BaseActivity {
     private void initViews() {
         setupToolbar();
         viewPagerAdapter = new ArtistOffersViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFrament(new BaseFragment(), "HOME");
-        viewPagerAdapter.addFrament(new BaseFragment(), "TOP FREE");
+        viewPagerAdapter.addFrament(new LatestArtistOffersFragment(), getResources().getString(R.string.fragment_latest_artist_offers_tag));
+        viewPagerAdapter.addFrament(new FavouriteArtistOffersFragment(), getResources().getString(R.string.fragment_favourite_artist_offers_tag));
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -93,6 +101,14 @@ public class ArtistOffersActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_artist_offers_menu, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -102,6 +118,9 @@ public class ArtistOffersActivity extends BaseActivity {
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
             onBackPressed();
+            return true;
+        } else if (id == R.id.action_notification_bell) {
+            Toast.makeText(context, "IDK", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -116,12 +135,22 @@ public class ArtistOffersActivity extends BaseActivity {
                         .data, getResources().getDisplayMetrics());
                 Log.d(TAG, "initViews: action height = " + height);
                 Log.d(TAG, "initViews: status height = " + getStatusBarHeight(context));
-                Log.d(TAG, "initViews: tab height = " +TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,getResources().getDisplayMetrics()));
+                Log.d(TAG, "initViews: tab height = " + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics()));
 
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) toolbar_container.getLayoutParams();
-                params.height = (int) (height + getStatusBarHeight(context) + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,getResources().getDisplayMetrics()));
+                params.height = (int) (height + getStatusBarHeight(context) + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics()));
                 toolbar_container.setLayoutParams(params);
             }
         }
+    }
+
+    @Override
+    public void onLatestArtistOffersFragmentOpened() {
+        Log.d(TAG, "onLatestArtistOffersFragmentOpened: ");
+    }
+
+    @Override
+    public void onFavouriteArtistFragmentOpened() {
+        Log.d(TAG, "onFavouriteArtistFragmentOpened: ");
     }
 }

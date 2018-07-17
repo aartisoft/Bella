@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root_fragment_favourite_artist_offers"
+    tools:context=".activity.artist_offers_activity.fragments.FavouriteArtistOffersFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rv_favourite_artist_offers"
+        android:overScrollMode="never"
+      />
+
+</android.support.v4.widget.SwipeRefreshLayout>

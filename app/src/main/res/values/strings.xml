@@ -42,6 +42,8 @@
     <string name="my_reservation">My Reservation</string>
     <string name="main_reservations_fragment_tag">main_reservations_fragment</string>
     <string name="artist_offers">Artist Offers</string>
+    <string name="fragment_latest_artist_offers_tag">Latest</string>
+    <string name="fragment_favourite_artist_offers_tag">Favourite</string>
 
     <!--  <string-array name="governoments">
         <item>الإسكندرية</item>
