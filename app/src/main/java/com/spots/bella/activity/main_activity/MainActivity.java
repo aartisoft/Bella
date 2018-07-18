@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity
         initViews();
     }
 
+
     private void initViews() {
         navigationView.setNavigationItemSelectedListener(this);
         swipe_root_content_main.setOnRefreshListener(this);
