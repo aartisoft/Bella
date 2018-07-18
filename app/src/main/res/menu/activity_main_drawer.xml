@@ -16,6 +16,10 @@
             app:actionLayout="@layout/menu_counter"
             />
         <item
+            android:title="@string/artist_fragment_offers"
+            android:id="@+id/drawer_artist_offers"
+            />
+        <item
             android:title="Map"
             android:id="@+id/drawer_menu_map"
             />

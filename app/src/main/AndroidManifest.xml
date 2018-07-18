@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activity.artist_offers_activity.ArtistOffersActivity"
+            android:name=".activity.login_activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -29,7 +29,7 @@
         </activity>
 
         <activity
-            android:name=".activity.login_activity.LoginActivity"
+            android:name=".activity.main_activity.MainActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity
@@ -45,7 +45,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.post_activity.PostActivity" />
-        <activity android:name=".activity.main_activity.MainActivity"></activity>
+        <activity android:name=".activity.artist_offers_activity.ArtistOffersActivity"></activity>
     </application>
 
 </manifest>

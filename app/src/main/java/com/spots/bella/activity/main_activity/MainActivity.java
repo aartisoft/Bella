@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -24,14 +23,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.spots.bella.R;
+import com.spots.bella.activity.artist_offers_activity.ArtistOffersActivity;
 import com.spots.bella.activity.messages_activity.MessagesActivity;
 import com.spots.bella.activity.my_reservation_activity.MyReservationActivity;
 import com.spots.bella.adapters.MainRecyclerViewAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -66,6 +69,12 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.swipe_root_content_main)
     SwipeRefreshLayout swipe_root_content_main;
+
+    /*@OnClick(R.id.iv_profile)
+    void profilePic() {
+        Toast.makeText(MainActivity.this, "Not Ready!", Toast.LENGTH_SHORT).show();
+    }*/
+
     private MPresenter mMPresenter;
 
     @Override
@@ -163,6 +172,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
+            Toast.makeText(MainActivity.this, "Not Ready!", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -183,6 +193,12 @@ public class MainActivity extends AppCompatActivity
                     startActivity(new Intent(MainActivity.this, MessagesActivity.class));
                 } else if (id == R.id.drawer_menu_reservation) {
                     startActivity(new Intent(MainActivity.this, MyReservationActivity.class));
+                } else if (id == R.id.drawer_artist_offers) {
+                    startActivity(new Intent(MainActivity.this, ArtistOffersActivity.class));
+                } else if (id == R.id.drawer_menu_map) {
+                    Toast.makeText(MainActivity.this, "Not Ready!", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.drawer_menu_setting) {
+                    Toast.makeText(MainActivity.this, "Not Ready!", Toast.LENGTH_SHORT).show();
                 }
             }
         }, getResources().getInteger(R.integer.time_drawer_item_clicks_milis));
