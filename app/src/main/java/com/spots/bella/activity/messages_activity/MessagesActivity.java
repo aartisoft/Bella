@@ -121,6 +121,6 @@ public class MessagesActivity extends AppCompatActivity implements
 
     @Override
     public void onMainMessagesFragmentOpened() {
-
+        Log.d(TAG, "onMainMessagesFragmentOpened: ");
     }
 }

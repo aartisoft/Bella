@@ -8,20 +8,19 @@ import android.os.Build;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.spots.bella.R;
-import com.spots.bella.activity.main_activity.MainActivity;
-
 public class Common {
     public static final int ARTIST = 280;
     public static final int NORMAL_USER = 329;
+    public static final String ARTIST_STRING = "ARTIST";
+    public static final String NORMAL_USER_STRING = "NORMAL_USER";
+    public static final String USER_STRING = "USER";
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {
@@ -82,8 +81,14 @@ public class Common {
     }
 
     public static void setMenuCounter(NavigationView navigationView, @IdRes int itemId, int count) {
-        assert navigationView!=null;
+        assert navigationView != null;
         TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
         view.setText(count > 0 ? String.valueOf(count) : null);
+    }
+
+    public static void hideDialog(AlertDialog dialog) {
+        if (dialog != null) {
+            dialog.cancel();
+        }
     }
 }

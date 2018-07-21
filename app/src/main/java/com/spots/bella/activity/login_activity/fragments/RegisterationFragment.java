@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -34,10 +35,27 @@ public class RegisterationFragment extends Fragment implements OnKeyboardVisibil
     private Unbinder unbinder;
     @BindView(R.id.tv_aha_user_registeration_fragment)
     TextView tv_aha_user_registeration_fragment;
+
     @BindView(R.id.iv_user_register_fragment_logo)
     CircleImageView iv_user_register_fragment_logo;
+
+    @BindView(R.id.et_first_name_register_fragment)
+    TextInputEditText et_first_name;
+
+    @BindView(R.id.et_last_name_register_fragment)
+    TextInputEditText et_last_name;
+
+    @BindView(R.id.et_email_register_fragment)
+    TextInputEditText et_email;
+    @BindView(R.id.et_password_register_fragment)
+    TextInputEditText et_password;
+
+    @BindView(R.id.et_password_confirmation_register_fragment)
+    TextInputEditText et_password_confirmation;
+
     private static int TYPE;
     private OnRegisterFragmentInteractionListener mListener;
+    private boolean fieldsValid;
 
     public RegisterationFragment() {
         // Required empty public constructor
@@ -98,7 +116,13 @@ public class RegisterationFragment extends Fragment implements OnKeyboardVisibil
     @OnClick(R.id.btn_register_fragment_next)
     public void next() {
         Log.d(TAG, "onClick: next");
+        isFieldsValid();
         mListener.onRegisterNextBtnClicked(TYPE);
+    }
+
+    public void isFieldsValid() {
+        String first_name, last_name, phone, password, password_confirmation;
+        return;
     }
 
     public interface OnRegisterFragmentInteractionListener {
