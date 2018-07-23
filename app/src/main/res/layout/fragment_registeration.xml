@@ -183,7 +183,8 @@
                 android:layout_marginTop="6dp"
                 android:background="@drawable/dark_burble_button_background"
                 android:text="NEXT"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                />
         </LinearLayout>
 
         <TextView

@@ -6,7 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -17,6 +17,8 @@ import android.widget.FrameLayout;
 
 import com.spots.bella.R;
 import com.spots.bella.constants.OnKeyboardVisibilityListener;
+import com.spots.bella.constants.Utils;
+import com.spots.bella.di.BaseFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,7 +26,10 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class LoginFragment extends Fragment implements OnKeyboardVisibilityListener {
+import static com.spots.bella.constants.Common.emailPattern;
+import static com.spots.bella.constants.Common.showShortMessage;
+
+public class LoginFragment extends BaseFragment implements OnKeyboardVisibilityListener {
 
     private static final String TAG = "LoginFragment";
     private OnLoginFragmentInteractionListener mListener;
@@ -95,13 +100,39 @@ public class LoginFragment extends Fragment implements OnKeyboardVisibilityListe
     }
 
     @OnClick(R.id.btn_login_fragment_login)
-    public void login(View view) {
+    public void login() {
         Log.d(TAG, "onClick: login");
-        mListener.onLoginBtnClicked();
+        isValidFields();
+    }
+
+    private void isValidFields() {
+
+        String email = et_login_fragment_email.getText().toString();
+        String password = et_login_fragment_password.getText().toString();
+
+        if (email.isEmpty() || !emailPattern.matcher(email).matches()) {
+            showShortMessage("Enter your email!", getActivity().findViewById(android.R.id.content));
+            return;
+        }
+        if (TextUtils.isEmpty(password)){
+            showShortMessage("Enter your password!", getActivity().findViewById(android.R.id.content));
+            return;
+        }
+        if(password.length()<6) {
+            showShortMessage("Password is too short!", getActivity().findViewById(android.R.id.content));
+            return;
+        }
+        if (Utils.isNetworkAvailable(context)) {
+            mListener.onLoginBtnClicked(email,password); // data true enter
+        }
+        else
+        {
+            showShortMessage("No Internet Connection!", getActivity().findViewById(android.R.id.content));
+        }
     }
 
     @OnClick(R.id.btn_login_fragment_register)
-    public void register(View view) {
+    public void register() {
         Log.d(TAG, "onClick: login");
         mListener.onRegisterBtnClicked();
     }
@@ -115,8 +146,11 @@ public class LoginFragment extends Fragment implements OnKeyboardVisibilityListe
     public interface OnLoginFragmentInteractionListener {
         // TODO: Update argument type and name
         void onLoginFragmentOpened();
+
         void onRegisterBtnClicked();
-        void onLoginBtnClicked();
+
+        void onLoginBtnClicked(String email, String password);
+
         void onForgotPasswordBtnClicked();
     }
 

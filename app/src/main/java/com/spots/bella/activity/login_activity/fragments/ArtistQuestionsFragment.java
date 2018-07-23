@@ -3,23 +3,19 @@ package com.spots.bella.activity.login_activity.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.Button;
 
-import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.shawnlin.numberpicker.NumberPicker;
 import com.spots.bella.R;
-import com.spots.bella.activity.WizardActivity;
+import com.spots.bella.constants.Common;
 
 import java.util.Locale;
 
@@ -35,8 +31,11 @@ public class ArtistQuestionsFragment extends Fragment {
 
 
     private static final String TAG = ArtistQuestionsFragment.class.getSimpleName();
+    private static String UID;
     private Unbinder unbinder;
     private OnArtistQuestionsFragmentInteractionListener mListener;
+    private String city = null;
+    private int orders_no;
 
     public ArtistQuestionsFragment() {
         // Required empty public constructor
@@ -51,6 +50,14 @@ public class ArtistQuestionsFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnAboutFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle b = getArguments();
+        assert b != null;
+        UID = b.getString("uid");
     }
 
     @BindView(R.id.number_picker)
@@ -131,11 +138,11 @@ public class ArtistQuestionsFragment extends Fragment {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 Log.d(TAG, String.format(Locale.US, "oldVal: %d, newVal: %d", oldVal, newVal));
+                orders_no = newVal;
             }
         });
         return v;
     }
-
 
 
     @Override
@@ -158,20 +165,24 @@ public class ArtistQuestionsFragment extends Fragment {
     public interface OnArtistQuestionsFragmentInteractionListener {
         // TODO: Update argument type and name
         void onArtistQuestionsFragmentOpened();
-        void onArtistQuestionsFragmentBtnClickFinish();
+
+        void onArtistQuestionsFragmentBtnClickFinish(String UID, int i, String city);
     }
 
     @OnClick(R.id.city_artist_questions_fragment_btn)
-    public void selectGovernoment() {
-        CreateAlertDialogWithRadioButtonGroup();
+    public void selectGovernoment(View view) {
+        CreateAlertDialogWithRadioButtonGroup(view);
     }
 
     @OnClick(R.id.finish_artist_questions_fragment_btn)
     public void finish() {
-       mListener.onArtistQuestionsFragmentBtnClickFinish();
+        if (city == null) {
+            Common.showShortMessage("Choose your city", getActivity().findViewById(android.R.id.content));
+        } else
+            mListener.onArtistQuestionsFragmentBtnClickFinish(UID, orders_no, city);
     }
 
-    private void CreateAlertDialogWithRadioButtonGroup() {
+    private void CreateAlertDialogWithRadioButtonGroup(final View view) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.MaterialThemeDialog);
         final CharSequence[] values = getActivity().getResources().getStringArray(R.array.governoments);
@@ -181,6 +192,9 @@ public class ArtistQuestionsFragment extends Fragment {
 
             public void onClick(DialogInterface dialog, int item) {
                 Log.d(TAG, "onClick: ");
+                city = (String) values[item];
+                ((Button) view).setText(city);
+                dialog.dismiss();
             }
         });
         AlertDialog dialog_genre = builder.create();
