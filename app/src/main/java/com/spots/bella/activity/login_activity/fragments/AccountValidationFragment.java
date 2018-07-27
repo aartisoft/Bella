@@ -20,45 +20,33 @@ import butterknife.Unbinder;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConfirmCodeFragment extends Fragment {
+public class AccountValidationFragment extends Fragment {
 
-    private static final String TAG = "ConfirmCodeFragment";
-    private static String EMAIL;
-    private OnConfirmCodeFragmentInteractionListener mListener;
+    private static final String TAG = "AccountValidationFragme";
+    private OnEmailVerificationFragmentInteractionListener mListener;
     private Unbinder unbinder;
 
-    public ConfirmCodeFragment() {
+    public AccountValidationFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnConfirmCodeFragmentInteractionListener) {
-            mListener = (OnConfirmCodeFragmentInteractionListener) context;
+        if (context instanceof OnEmailVerificationFragmentInteractionListener) {
+            mListener = (OnEmailVerificationFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnConfirmCodeFragmentInteractionListener");
+                    + " must implement OnEmailVerificationFragmentInteractionListener");
         }
     }
 
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Bundle b = getArguments();
-        if (b == null) {
-            getActivity().onBackPressed();
-        } else
-            EMAIL = b.getString("email");
-        Log.d(TAG, "onCreate: EMAIL = " + EMAIL);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_confirm_code, container, false);
+        View v = inflater.inflate(R.layout.acccount_validation_fragment, container, false);
         unbinder = ButterKnife.bind(this, v);
 
         return v;
@@ -67,7 +55,7 @@ public class ConfirmCodeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mListener.onConfirmCodeOpened();
+        mListener.onEmailVerificationFragmentOpened();
     }
 
     @Override
@@ -84,19 +72,13 @@ public class ConfirmCodeFragment extends Fragment {
     }
 
     @OnClick(R.id.btn_resend_code_fragment_confirm_code)
-    public void resend() {
-        mListener.onResendCodeClicked(EMAIL);
+    public void send_verification() {
+        mListener.onVerificationClicked();
     }
-    @OnClick(R.id.btn_confirm_code_fragment_next)
-    public void next() {
-        mListener.onConfirmCodeNextClicked("123xyz",EMAIL);
-    }
+    
+    public interface OnEmailVerificationFragmentInteractionListener {
+        void onEmailVerificationFragmentOpened();
 
-    public interface OnConfirmCodeFragmentInteractionListener {
-        void onConfirmCodeOpened();
-
-        void onResendCodeClicked(String email);
-
-        void onConfirmCodeNextClicked(String code, String email);
-    }
+        void onVerificationClicked();
+        }
 }

@@ -1,7 +1,11 @@
 package com.spots.bella.di;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 
 import javax.inject.Singleton;
 
@@ -24,13 +28,24 @@ public class AppModule {
 
     @Provides
     @Singleton
-    SharedPreferences providesSharedPrefrences(Context app) {
-        return app.getSharedPreferences("user_data", Context.MODE_PRIVATE);
+    String providesName() {
+        return "Bob";
     }
 
     @Provides
     @Singleton
-    String providesName() {
-        return "Bob";
+    Gson providesGson() {
+        return new Gson();
+    }
+
+    @Provides
+    @Singleton
+    DatabaseReference providesRootRefrence() {
+        return FirebaseDatabase.getInstance().getReference();
+    }
+    @Provides
+    @Singleton
+    FirebaseAuth providesFirebaseAuth() {
+        return FirebaseAuth.getInstance();
     }
 }

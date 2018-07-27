@@ -12,13 +12,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.spots.bella.PreferenceManager;
 import com.spots.bella.models.BaseUser;
-import com.spots.bella.models.NormalUser;
+import com.spots.bella.models.MoreDetailsUserArtist;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,6 +33,7 @@ public class Common {
     public static final String ARTIST_STRING = "ARTIST";
     public static final String NORMAL_USER_STRING = "NORMAL_USER";
     public static final String USER_STRING = "USER";
+    public static final int LOADING_DURATION = 1500;
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {
@@ -58,7 +61,7 @@ public class Common {
         return (int) px;
     }
 
-    public static boolean isValidEmail(String email) {
+    public static boolean isValidEmailForm(String email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
@@ -112,19 +115,19 @@ public class Common {
         snack.show();
     }
 
-    public static boolean isWordContainsDigit(String s){
+    public static boolean isWordContainsDigit(String s) {
 //        return s.matches("[A-Za-z][^.]*");
         return s.matches(".*\\d+.*");
     }
 
-    public static BaseUser getUserData(SharedPreferences prefs) {
+    public static BaseUser getUserData(PreferenceManager pM) {
         BaseUser currentUser;
-        String first_name = prefs.getString("user_first_name", null);
-        String last_name = prefs.getString("user_last_name", null);
-        String email = prefs.getString("user_email", null);
-        String password = prefs.getString("user_password", null);
-        String phone = prefs.getString("user_phone", null);
-        String type = prefs.getString("user_type", null);
+        String first_name = pM.readeString(PreferenceManager.USER_FIRST_NAME);
+        String last_name = pM.readeString(PreferenceManager.USER_LAST_NAME);
+        String email = pM.readeString(PreferenceManager.USER_EMAIL);
+        String password = pM.readeString(PreferenceManager.USER_PASSWORD);
+        String phone = pM.readeString(PreferenceManager.USER_PHONE);
+        String type = pM.readeString(PreferenceManager.USER_TYPE);
         if (first_name == null &&
                 email == null &&
                 last_name == null &&
@@ -143,6 +146,19 @@ public class Common {
         }
     }
 
+    public static void saveUserData(PreferenceManager pM, String first_name, String last_name, String email, String password, String user_phone, String user_type, MoreDetailsUserArtist moreDetails) {
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_FIRST_NAME, first_name);
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_LAST_NAME, last_name);
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_EMAIL, email);
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_PASSWORD, password);
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_PHONE, user_phone);
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_TYPE, user_type);
+        if (moreDetails != null && user_type.equals(ARTIST_STRING)) {
+            pM.writeSharedPrefrenceString(PreferenceManager.USER_CITY, moreDetails.getCity());
+            pM.writeSharedPrefrenceString(PreferenceManager.USER_MAX_ORDERS, moreDetails.getMax_orders());
+        }
+    }
+
 
     public static String capitalizeFristLetter(String word) {
         if (word == null || word.length() == 0) {
@@ -150,5 +166,9 @@ public class Common {
         }
 
         return StringUtils.capitalize(word.toLowerCase().trim());
+    }
+
+    public static void hideSoftKeyboard() {
+
     }
 }

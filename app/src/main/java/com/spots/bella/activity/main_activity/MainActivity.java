@@ -25,11 +25,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
 import com.spots.bella.activity.artist_offers_activity.ArtistOffersActivity;
 import com.spots.bella.activity.messages_activity.MessagesActivity;
 import com.spots.bella.activity.my_reservation_activity.MyReservationActivity;
 import com.spots.bella.adapters.MainRecyclerViewAdapter;
+import com.spots.bella.constants.Common;
+import com.spots.bella.di.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,7 +46,7 @@ import static com.spots.bella.constants.Common.setMenuCounter;
 import static com.spots.bella.constants.Common.setTranslucentStatusBar;
 import static com.spots.bella.constants.Common.syncToolbar;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, MView, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MainActivity";
@@ -96,6 +99,9 @@ public class MainActivity extends AppCompatActivity
         mMPresenter = new MPresenterIMP(this);
 
         initViews();
+
+        Toast.makeText(context, "Welcome " + pM.readeString(PreferenceManager.USER_TYPE) + " " + pM.readeString(PreferenceManager.USER_FIRST_NAME), Toast.LENGTH_SHORT).show();
+
     }
 
 
@@ -232,7 +238,7 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         snack.show();
                     }
-                }, 3000);
+                }, Common.LOADING_DURATION);
             }
         });
         snack.show();

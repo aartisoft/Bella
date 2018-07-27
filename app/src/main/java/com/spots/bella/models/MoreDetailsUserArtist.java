@@ -4,6 +4,9 @@ public class MoreDetailsUserArtist {
     private String city;
     private String max_orders;
 
+    public MoreDetailsUserArtist() {
+    }
+
     public MoreDetailsUserArtist(String city, String max_orders) {
         this.city = city;
         this.max_orders = max_orders;

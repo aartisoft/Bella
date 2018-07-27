@@ -22,14 +22,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.spots.bella.R;
 import com.spots.bella.activity.WizardActivity;
+import com.spots.bella.activity.login_activity.fragments.AccountValidationFragment;
 import com.spots.bella.activity.login_activity.fragments.ArtistQuestionsFragment;
-import com.spots.bella.activity.login_activity.fragments.ConfirmCodeFragment;
-import com.spots.bella.activity.login_activity.fragments.ConfirmCodeFragment.OnConfirmCodeFragmentInteractionListener;
+import com.spots.bella.activity.login_activity.fragments.AccountValidationFragment.OnEmailVerificationFragmentInteractionListener;
 import com.spots.bella.activity.login_activity.fragments.DetectRegisterationFragment;
 import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment;
 import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment.OnForgotPasswordFragmentInteractionListener;
@@ -40,6 +42,7 @@ import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment.O
 import com.spots.bella.constants.Common;
 import com.spots.bella.constants.Utils;
 import com.spots.bella.di.BaseActivity;
+import com.spots.bella.models.ArtistUser;
 import com.spots.bella.models.BaseUser;
 import com.spots.bella.models.MoreDetailsUserArtist;
 import com.spots.bella.models.NormalUser;
@@ -60,13 +63,11 @@ public class LoginActivity extends BaseActivity implements
         OnDetectRegisterationFragmentInteractionListener,
         OnArtistQuestionsFragmentInteractionListener,
         OnForgotPasswordFragmentInteractionListener,
-        OnConfirmCodeFragmentInteractionListener,
+        OnEmailVerificationFragmentInteractionListener,
         OnResetPasswordFragmentInteractionListener,
         OnRegisterFragmentInteractionListener {
 
-    private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-    private FirebaseDatabase database;
     private DatabaseReference normal_users_ref;
     private DatabaseReference artist_users_ref;
 
@@ -75,38 +76,70 @@ public class LoginActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         darkStatusBarSetup(getWindow());
         setContentView(R.layout.activity_login);
-
         initFirebase();
-
-        showLoginFragment();
-
     }
-
     private void initFirebase() {
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
-        DatabaseReference users = database.getReference(Common.USER_STRING);
+        DatabaseReference users = database.child(Common.USER_STRING);
         artist_users_ref = users.child(ARTIST_STRING);
         normal_users_ref = users.child(NORMAL_USER_STRING);
-
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
+                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                if (user != null) { // USER SIGNED IN // show login
                     Log.d(TAG, "onAuthStateChanged: 1");
-                    BaseUser user_logged_in = Common.getUserData(prefs); // check saved user data
-                    if (user_logged_in == null) { // problem in saved data
+                    BaseUser user_logged_in = Common.getUserData(pM); // check saved user data
+                    if (user_logged_in == null) { // USER SIGNED IN BUT APP'S DATA CLEARED // problem in saved data
                         Log.d(TAG, "onAuthStateChanged: 2");
                         Log.d(TAG, "onAuthStateChanged: USER LOGGED IN DATA NOT AVAILABLE");
-                    } else { // show login
-
+                        showLoginFragment();
+                    } else {// USER SIGNED IN && AND HIS DATA EXISTS
                         Log.d(TAG, "onAuthStateChanged: 3");
                         Log.d(TAG, "onAuthStateChanged: USER LOGGED IN ");
+
+                        // TODO: check mail is valid!
+                        if (user.isEmailVerified()) {   // show home
+                            Log.d(TAG, "onAuthStateChanged: 3.1 EMAIL IS VERFIED");
+                            startActivity(new Intent(context, WizardActivity.class));
+                            finish();
+                        }
+                        else
+                        {
+                            Log.d(TAG, "onAuthStateChanged: 3.2 USER EMAIL NOT VERIFIED");
+                            showEmailVerificationFragment();
+                        }
+
                     }
+                }
+                else // USER NOT SIGNED IN
+                {
+                    Log.d(TAG, "onAuthStateChanged: 4");
+                    showLoginFragment();
                 }
             }
         };
+    }
+
+
+    private void sendEmailVerfication() {
+        Log.d(TAG, "sendEmailVerfication: ");
+        mFirebaseAuth.getCurrentUser()
+                .sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "onSuccess: ");
+                hideDialog(dialog);
+                showLoginFragment();
+                showShortMessage("Verification E-Mail sent",findViewById(android.R.id.content));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                hideDialog(dialog);
+                Log.d(TAG, "onFailure: "+e.getMessage());
+                showShortMessage("An error occurred!",findViewById(android.R.id.content));
+            }
+        });
     }
 
     @Override
@@ -153,33 +186,105 @@ public class LoginActivity extends BaseActivity implements
                 mFirebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
-                            public void onSuccess(AuthResult authResult) {
+                            public void onSuccess(final AuthResult authResult) {
                                 Log.d(TAG, "onSuccess: LOGIN");
-                                hideDialog(dialog);
-                                startActivity(new Intent(LoginActivity.this, WizardActivity.class));
-                                finish();
+                                artist_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        ArtistUser artistUser = null;
+                                        for (DataSnapshot child:dataSnapshot.getChildren())
+                                        {
+                                            if (child.getKey().equals(authResult.getUser().getUid())) {
+                                                artistUser = child.getValue(ArtistUser.class);
+                                            }
+                                        }
+                                        if (artistUser!=null) {
+                                            Log.d(TAG, "onDataChange: USER IS ARTIST");
+                                            Common.saveUserData(pM,artistUser.getFrist_name(),artistUser.getLast_name(),artistUser.getEmail(),artistUser.getPassword(),artistUser.getPhone(),artistUser.getType(),artistUser.getMore_details());
+                                            hideDialog(dialog);
+                                            // TODO: Check email validation
+                                            if (authResult.getUser().isEmailVerified()) {
+                                                startActivity(new Intent(LoginActivity.this, WizardActivity.class));
+                                                finish();
+                                            }
+                                            else
+                                            {
+                                                showEmailVerificationFragment();
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            Log.d(TAG, "onDataChange: USER NOT ARTIST");
+                                            normal_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    NormalUser normalUser = null;
+                                                    for (DataSnapshot child: dataSnapshot.getChildren())
+                                                    {
+                                                        if (child.getKey().equals(authResult.getUser().getUid())) {
+                                                            normalUser=child.getValue(NormalUser.class);
+                                                        }
+                                                    }
+                                                    if (normalUser!=null) {
+                                                        Log.d(TAG, "onDataChange: USER IS NORMAL USER");
+                                                        Common.saveUserData(pM,normalUser.getFrist_name(),normalUser.getLast_name(),normalUser.getEmail(),normalUser.getPassword(),normalUser.getPhone(),normalUser.getType(),null);
+                                                        hideDialog(dialog);
+                                                        // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
+                                                        // TODO : check email validation
+                                                        if (authResult.getUser().isEmailVerified()) { // verified go home
+                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED!");
+                                                            startActivity(new Intent(LoginActivity.this, WizardActivity.class));
+                                                            finish();
+                                                        }
+                                                        else // not verified show verification fragment
+                                                        {
+                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED");
+                                                            showEmailVerificationFragment();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Log.d(TAG, "onDataChange: USER IS NOT NORMAL USER & NOT EXIST !");
+                                                        hideDialog(dialog);
+                                                        showShortMessage("This User No Longer Exist!",findViewById(android.R.id.content));
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+                                                    Log.d(TAG, "onCancelled: "+databaseError.getMessage());
+                                                    hideDialog(dialog);
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Log.d(TAG, "onCancelled: "+databaseError.getMessage());
+                                        hideDialog(dialog);
+                                    }
+                                });
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: LOGIN: msg = "+e.getMessage());
+                                Log.d(TAG, "onFailure: LOGIN: msg = " + e.getMessage());
                                 hideDialog(dialog);
                                 if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
                                     showShortMessage("Check network connection!", findViewById(android.R.id.content));
-                                }
-                                else if (e.getMessage().contains("There is no user record corresponding to this identifier")) {   // No Email like that
+                                } else if (e.getMessage().contains("There is no user record corresponding to this identifier")) {   // No Email like that
                                     showShortMessage("Wrong email or password!", findViewById(android.R.id.content));
-                                }
-                                else if (e.getMessage().contains("The password is invalid or the user does not have a password")) {   // Wrong password
+                                } else if (e.getMessage().contains("The password is invalid or the user does not have a password")) {   // Wrong password
                                     showShortMessage("Wrong password!", findViewById(android.R.id.content));
-                                }
-                                else
+                                } else
                                     showShortMessage("Unknown error, try again!", findViewById(android.R.id.content));
                             }
                         });
             }
-        }, 3000);
+        }, Common.LOADING_DURATION);
     }
 
     @Override
@@ -298,8 +403,7 @@ public class LoginActivity extends BaseActivity implements
                                                 Log.d(TAG, "onFailure:Register Saving to db : 1.2" + e.getMessage());
                                                 if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
                                                     showShortMessage("Check network connection!", findViewById(android.R.id.content));
-                                                }
-                                                else {
+                                                } else {
                                                     showShortMessage("Check log for error", findViewById(android.R.id.content));
                                                 }
                                             }
@@ -322,7 +426,7 @@ public class LoginActivity extends BaseActivity implements
                     }
                 });
             }
-        }, 3000);
+        }, Common.LOADING_DURATION);
     }
 
 
@@ -349,6 +453,7 @@ public class LoginActivity extends BaseActivity implements
     @Override
     public void onArtistQuestionsFragmentOpened() {
         Log.d(TAG, "onArtistQuestionsFragmentOpened: ");
+        // DON'T FORGET HIDE THE SOFT KEYBOARD #
     }
 
     @Override
@@ -384,7 +489,7 @@ public class LoginActivity extends BaseActivity implements
                                 }
                             });
                 }
-            }, 3000);
+            }, Common.LOADING_DURATION);
         } else {
             showShortMessage("No internet connection!", findViewById(android.R.id.content));
         }
@@ -423,78 +528,59 @@ public class LoginActivity extends BaseActivity implements
     @Override
     public void onForgotPasswordNextClicked(final String email) {
         Log.d(TAG, "onForgotPasswordNextClicked: ");
-        sendResetPasswordEmail(email);
-    }
-
-    private void showConfirmationCodeFragment(String email) {
-        ConfirmCodeFragment fragment = new ConfirmCodeFragment();
-        Bundle b = new Bundle();
-        b.putString("email", email);
-        fragment.setArguments(b);
-
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.root_login_activity_container, fragment, getResources().getString(R.string.confirm_code_fragment_tag));
-        fragmentTransaction.addToBackStack(null).commit();
-    }
-
-    @Override
-    public void onConfirmCodeOpened() {
-        Log.d(TAG, "onConfirmCodeOpened: ");
-    }
-
-    @Override
-    public void onResendCodeClicked(String email) {
-        Log.d(TAG, "onResendCodeClicked: ");
-        sendResetPasswordEmail(email);
-    }
-
-    @Override
-    public void onConfirmCodeNextClicked(String code, String email) {
-        Log.d(TAG, "onConfirmCodeNextClicked: ");
-        checkValidation(code, email);
-    }
-
-    private void checkValidation(String code, final String email) {
         showDialog();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (dialog != null) {
-                    // empty fields
-                    dialog.cancel();
-                }
-                // show next level
-                showResetPasswordFragment(email);
+                sendResetPasswordEmail(email);
             }
-        }, 3000);
+        }, Common.LOADING_DURATION);
     }
 
-    private void showResetPasswordFragment(String email) {
-        Log.d(TAG, "showResetPasswordFragment: ");
-        ResetPasswordFragment fragment = new ResetPasswordFragment();
-        Bundle b = new Bundle();
-        b.putString("email", email);
-        fragment.setArguments(b);
-
+    private void showEmailVerificationFragment(){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.root_login_activity_container, fragment, getResources().getString(R.string.reset_password_fragment_tag));
-        fragmentTransaction.addToBackStack(null).commit();
+        fragmentTransaction.replace(R.id.root_login_activity_container, new AccountValidationFragment(), getResources().getString(R.string.email_verficarion_fragment_tag));
+        fragmentTransaction.commit();
     }
+
+    @Override
+    public void onEmailVerificationFragmentOpened() {
+        Log.d(TAG, "onEmailVerificationFragmentOpened: ");
+    }
+
+    @Override
+    public void onVerificationClicked() {
+        Log.d(TAG, "onVerificationClicked: ");
+        showDialog();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendEmailVerfication();
+            }
+        }, Common.LOADING_DURATION);
+    }
+
+
 
     private void sendResetPasswordEmail(final String email) {
         Log.d(TAG, "sendResetPasswordEmail: ");
-        showDialog();
-        new Handler().postDelayed(new Runnable() {
+        mFirebaseAuth.sendPasswordResetEmail(email).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public void run() {
-                if (dialog != null) {
-                    // empty fields
-                    dialog.cancel();
-                }
-                Toast.makeText(LoginActivity.this, "Confirmation code sent to your e-mail.", Toast.LENGTH_SHORT).show();
-                showConfirmationCodeFragment(email);
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "onSuccess: ");
+                showLoginFragment();
+                hideDialog(dialog);
+                showShortMessage("Reset E-Mail sent",findViewById(android.R.id.content));
             }
-        }, 3000);
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                hideDialog(dialog);
+                Log.d(TAG, "onFailure: "+e.getMessage());
+                Toast.makeText(context, "Error occured "+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+//                showEmailVerificationFragment(email);
     }
 
     @Override
@@ -516,6 +602,6 @@ public class LoginActivity extends BaseActivity implements
                 Common.clearBackStackFragments(getSupportFragmentManager());
                 showLoginFragment();
             }
-        }, 3000);
+        }, Common.LOADING_DURATION);
     }
 }

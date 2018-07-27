@@ -2,6 +2,8 @@ package com.spots.bella.activity.main_activity;
 
 import android.os.Handler;
 
+import com.spots.bella.constants.Common;
+
 public class MInteractorIMP implements MInteractor {
 
     public MInteractorIMP() {
@@ -13,8 +15,8 @@ public class MInteractorIMP implements MInteractor {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                listener.onSuccess("NOTE: MVP Working Correctly",1);
+                listener.onSuccess("NOTE: MVP Working Correctly", 1);
             }
-        }, 3000);
+        }, Common.LOADING_DURATION);
     }
 }

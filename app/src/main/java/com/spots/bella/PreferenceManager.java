@@ -2,7 +2,6 @@ package com.spots.bella;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.content.ContextCompat;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -12,6 +11,14 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class PreferenceManager {
+    public static final String USER_FIRST_NAME = "user_first_name";
+    public static final String USER_LAST_NAME = "user_type";
+    public static final String USER_EMAIL = "user_email";
+    public static final String USER_PASSWORD = "user_password";
+    public static final String USER_PHONE = "user_phone";
+    public static final String USER_TYPE = "user_type";
+    public static final String USER_CITY = "user_city";
+    public static final String USER_MAX_ORDERS = "user_max_orders";
     private Context context;
     private SharedPreferences sharedPreferences;
 
@@ -33,5 +40,12 @@ public class PreferenceManager {
 
     public void clearPrefrences() {
         sharedPreferences.edit().clear().apply();
+    }
+
+    public void writeSharedPrefrenceString(String key, String value) {
+         sharedPreferences.edit().putString(key, value).apply();
+    }
+    public String readeString(String key) {
+        return sharedPreferences.getString(key,null);
     }
 }

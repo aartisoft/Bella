@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,13 +13,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
 import com.spots.bella.activity.main_activity.MainActivity;
 import com.spots.bella.adapters.WizaredSliderAdapter;
 import com.spots.bella.di.BaseActivity;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,12 +50,12 @@ public class WizardActivity extends BaseActivity {
     }
 
     private void checkAppOpenedBefore() {
-        Log.d(TAG, "checkAppOpenedBefore: " + string);
+        Log.d(TAG, "checkAppOpenedBefore: ");
 
-        pM.clearPrefrences();
+//        pM.clearPrefrences();
 
         if (pM.readSharedPrefrenceBoolean(getString(R.string.wizard_shown_key))) {
-            loadLoginRegister();
+            goHome();
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -138,7 +134,7 @@ public class WizardActivity extends BaseActivity {
 
     @OnClick(R.id.skip_btn)
     public void skip() {
-        loadLoginRegister();
+        goHome();
     }
 
     private void load_next_slide_click() {
@@ -147,13 +143,13 @@ public class WizardActivity extends BaseActivity {
         if (next_slide < layouts.length) {
             mPager.setCurrentItem(next_slide);
         } else {
-            loadLoginRegister();
+            goHome();
         }
     }
 
-    private void loadLoginRegister() {
+    private void goHome() {
         pM.writeSharedPrefrenceBoolean(getString(R.string.wizard_shown_key), true);
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(context, MainActivity.class));
         finish();
     }
 }

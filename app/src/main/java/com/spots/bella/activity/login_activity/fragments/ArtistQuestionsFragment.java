@@ -58,6 +58,7 @@ public class ArtistQuestionsFragment extends Fragment {
         Bundle b = getArguments();
         assert b != null;
         UID = b.getString("uid");
+        Common.hideSoftKeyboard();
     }
 
     @BindView(R.id.number_picker)
