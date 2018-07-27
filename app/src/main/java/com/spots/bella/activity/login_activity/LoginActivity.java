@@ -70,6 +70,7 @@ public class LoginActivity extends BaseActivity implements
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
     private DatabaseReference normal_users_ref;
     private DatabaseReference artist_users_ref;
+    private boolean isVerficationSent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,7 @@ public class LoginActivity extends BaseActivity implements
         setContentView(R.layout.activity_login);
         initFirebase();
     }
+
     private void initFirebase() {
         DatabaseReference users = database.child(Common.USER_STRING);
         artist_users_ref = users.child(ARTIST_STRING);
@@ -102,16 +104,18 @@ public class LoginActivity extends BaseActivity implements
                             Log.d(TAG, "onAuthStateChanged: 3.1 EMAIL IS VERFIED");
                             startActivity(new Intent(context, WizardActivity.class));
                             finish();
-                        }
-                        else
-                        {
+                        } else {
                             Log.d(TAG, "onAuthStateChanged: 3.2 USER EMAIL NOT VERIFIED");
-                            showEmailVerificationFragment();
+                            if (isVerficationSent) {
+                                showLoginFragment();
+                            } else {
+                                showEmailVerificationFragment();
+
+                            }
                         }
 
                     }
-                }
-                else // USER NOT SIGNED IN
+                } else // USER NOT SIGNED IN
                 {
                     Log.d(TAG, "onAuthStateChanged: 4");
                     showLoginFragment();
@@ -128,16 +132,17 @@ public class LoginActivity extends BaseActivity implements
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG, "onSuccess: ");
+                isVerficationSent = true;
                 hideDialog(dialog);
                 showLoginFragment();
-                showShortMessage("Verification E-Mail sent",findViewById(android.R.id.content));
+                showShortMessage("Verification E-Mail sent", findViewById(android.R.id.content));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 hideDialog(dialog);
-                Log.d(TAG, "onFailure: "+e.getMessage());
-                showShortMessage("An error occurred!",findViewById(android.R.id.content));
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                showShortMessage("An error occurred!", findViewById(android.R.id.content));
             }
         });
     }
@@ -192,43 +197,37 @@ public class LoginActivity extends BaseActivity implements
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         ArtistUser artistUser = null;
-                                        for (DataSnapshot child:dataSnapshot.getChildren())
-                                        {
+                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
                                             if (child.getKey().equals(authResult.getUser().getUid())) {
                                                 artistUser = child.getValue(ArtistUser.class);
                                             }
                                         }
-                                        if (artistUser!=null) {
+                                        if (artistUser != null) {
                                             Log.d(TAG, "onDataChange: USER IS ARTIST");
-                                            Common.saveUserData(pM,artistUser.getFrist_name(),artistUser.getLast_name(),artistUser.getEmail(),artistUser.getPassword(),artistUser.getPhone(),artistUser.getType(),artistUser.getMore_details());
+                                            Common.saveUserData(pM, artistUser.getFrist_name(), artistUser.getLast_name(), artistUser.getEmail(), artistUser.getPassword(), artistUser.getPhone(), artistUser.getType(), artistUser.getMore_details());
                                             hideDialog(dialog);
                                             // TODO: Check email validation
                                             if (authResult.getUser().isEmailVerified()) {
                                                 startActivity(new Intent(LoginActivity.this, WizardActivity.class));
                                                 finish();
-                                            }
-                                            else
-                                            {
+                                            } else {
                                                 showEmailVerificationFragment();
                                             }
 
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             Log.d(TAG, "onDataChange: USER NOT ARTIST");
                                             normal_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                                     NormalUser normalUser = null;
-                                                    for (DataSnapshot child: dataSnapshot.getChildren())
-                                                    {
+                                                    for (DataSnapshot child : dataSnapshot.getChildren()) {
                                                         if (child.getKey().equals(authResult.getUser().getUid())) {
-                                                            normalUser=child.getValue(NormalUser.class);
+                                                            normalUser = child.getValue(NormalUser.class);
                                                         }
                                                     }
-                                                    if (normalUser!=null) {
+                                                    if (normalUser != null) {
                                                         Log.d(TAG, "onDataChange: USER IS NORMAL USER");
-                                                        Common.saveUserData(pM,normalUser.getFrist_name(),normalUser.getLast_name(),normalUser.getEmail(),normalUser.getPassword(),normalUser.getPhone(),normalUser.getType(),null);
+                                                        Common.saveUserData(pM, normalUser.getFrist_name(), normalUser.getLast_name(), normalUser.getEmail(), normalUser.getPassword(), normalUser.getPhone(), normalUser.getType(), null);
                                                         hideDialog(dialog);
                                                         // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
                                                         // TODO : check email validation
@@ -236,24 +235,21 @@ public class LoginActivity extends BaseActivity implements
                                                             Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED!");
                                                             startActivity(new Intent(LoginActivity.this, WizardActivity.class));
                                                             finish();
-                                                        }
-                                                        else // not verified show verification fragment
+                                                        } else // not verified show verification fragment
                                                         {
                                                             Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED");
                                                             showEmailVerificationFragment();
                                                         }
-                                                    }
-                                                    else
-                                                    {
+                                                    } else {
                                                         Log.d(TAG, "onDataChange: USER IS NOT NORMAL USER & NOT EXIST !");
                                                         hideDialog(dialog);
-                                                        showShortMessage("This User No Longer Exist!",findViewById(android.R.id.content));
+                                                        showShortMessage("This User No Longer Exist!", findViewById(android.R.id.content));
                                                     }
                                                 }
 
                                                 @Override
                                                 public void onCancelled(DatabaseError databaseError) {
-                                                    Log.d(TAG, "onCancelled: "+databaseError.getMessage());
+                                                    Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                                                     hideDialog(dialog);
                                                 }
                                             });
@@ -262,7 +258,7 @@ public class LoginActivity extends BaseActivity implements
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-                                        Log.d(TAG, "onCancelled: "+databaseError.getMessage());
+                                        Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                                         hideDialog(dialog);
                                     }
                                 });
@@ -537,7 +533,7 @@ public class LoginActivity extends BaseActivity implements
         }, Common.LOADING_DURATION);
     }
 
-    private void showEmailVerificationFragment(){
+    private void showEmailVerificationFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.root_login_activity_container, new AccountValidationFragment(), getResources().getString(R.string.email_verficarion_fragment_tag));
         fragmentTransaction.commit();
@@ -561,7 +557,6 @@ public class LoginActivity extends BaseActivity implements
     }
 
 
-
     private void sendResetPasswordEmail(final String email) {
         Log.d(TAG, "sendResetPasswordEmail: ");
         mFirebaseAuth.sendPasswordResetEmail(email).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -570,14 +565,14 @@ public class LoginActivity extends BaseActivity implements
                 Log.d(TAG, "onSuccess: ");
                 showLoginFragment();
                 hideDialog(dialog);
-                showShortMessage("Reset E-Mail sent",findViewById(android.R.id.content));
+                showShortMessage("Reset E-Mail sent", findViewById(android.R.id.content));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 hideDialog(dialog);
-                Log.d(TAG, "onFailure: "+e.getMessage());
-                Toast.makeText(context, "Error occured "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Toast.makeText(context, "Error occured " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 //                showEmailVerificationFragment(email);
