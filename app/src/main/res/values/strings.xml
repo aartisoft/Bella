@@ -45,6 +45,9 @@
     <string name="fragment_latest_artist_offers_tag">Latest</string>
     <string name="fragment_favourite_artist_offers_tag">Favourite</string>
     <string name="artist_fragment_offers">Artist Offers</string>
+    <string name="create_post">Create Post</string>
+    <string name="say_something_about_this_photo">Say something about this photo...</string>
+    <string name="what_is_on_your_mind">What\'s on your mind?</string>
 
     <!--  <string-array name="governoments">
         <item>الإسكندرية</item>

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.spots.bella.R;
 import com.spots.bella.activity.messages_activity.fragments.MainMessagesFragment;
 import com.spots.bella.activity.messages_activity.fragments.MainMessagesFragment.OnMainMessagesFragmentInteractionListener;
+import com.spots.bella.di.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +28,7 @@ import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.setTranslucentStatusBar;
 import static com.spots.bella.constants.Common.syncToolbar;
 
-public class MessagesActivity extends AppCompatActivity implements
+public class MessagesActivity extends BaseActivity implements
         OnMainMessagesFragmentInteractionListener {
     private static final String TAG = "MessagesActivity";
 
@@ -42,18 +43,9 @@ public class MessagesActivity extends AppCompatActivity implements
 
 
     @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTranslucentStatusBar(MessagesActivity.this);
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/clan_ot_book_font.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build());
+
         setContentView(R.layout.activity_messages);
 
         ButterKnife.bind(this);

@@ -1,7 +1,7 @@
 package com.spots.bella.activity.main_activity;
 
-import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +11,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -25,25 +24,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
 import com.spots.bella.activity.artist_offers_activity.ArtistOffersActivity;
+import com.spots.bella.activity.make_post.MakePostActivity;
 import com.spots.bella.activity.messages_activity.MessagesActivity;
 import com.spots.bella.activity.my_reservation_activity.MyReservationActivity;
+import com.spots.bella.activity.post_activity.PostActivity;
 import com.spots.bella.adapters.MainRecyclerViewAdapter;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
+import com.spots.bella.models.Post;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static com.spots.bella.constants.Common.GALLERY_PICK_POST_IMAGE;
 import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.setMenuCounter;
-import static com.spots.bella.constants.Common.setTranslucentStatusBar;
 import static com.spots.bella.constants.Common.syncToolbar;
 
 public class MainActivity extends BaseActivity
@@ -73,34 +72,21 @@ public class MainActivity extends BaseActivity
     @BindView(R.id.swipe_root_content_main)
     SwipeRefreshLayout swipe_root_content_main;
 
-    /*@OnClick(R.id.iv_profile)
-    void profilePic() {
-        Toast.makeText(MainActivity.this, "Not Ready!", Toast.LENGTH_SHORT).show();
-    }*/
 
     private MPresenter mMPresenter;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //must be called before setContentView(...)
-        setTranslucentStatusBar(MainActivity.this);
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/clan_ot_book_font.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mMPresenter = new MPresenterIMP(this);
 
         initViews();
 
-        Toast.makeText(context, "Welcome " + pM.readeString(PreferenceManager.USER_TYPE) + " " + pM.readeString(PreferenceManager.USER_FIRST_NAME), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "Welcome " + pM.readeString(PreferenceManager.USER_TYPE) + " " + pM.readeString(PreferenceManager.USER_FIRST_NAME), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -114,7 +100,8 @@ public class MainActivity extends BaseActivity
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv_content_main.setLayoutManager(layoutManager);
         rv_content_main.setHasFixedSize(true);
-        MainRecyclerViewAdapter mAdapter = new MainRecyclerViewAdapter(this, mMPresenter);
+        ArrayList<Post> posts_list = new ArrayList<>();
+        MainRecyclerViewAdapter mAdapter = new MainRecyclerViewAdapter(this, mMPresenter, posts_list);
         rv_content_main.setAdapter(mAdapter);
     }
 
@@ -214,7 +201,16 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode== GALLERY_PICK_POST_IMAGE && resultCode==RESULT_OK&&data!=null){
+            Uri image_uri = data.getData();
+            startActivity(new Intent(this, MakePostActivity.class).putExtra("post_image",image_uri));
+        }
+    }
+
+    //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 //    public static void setStatusBarGradiant(Activity activity) {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            Window window = activity.getWindow();

@@ -2,6 +2,7 @@ package com.spots.bella.constants;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ public class Common {
     public static final String USER_STRING = "USER";
     public static final int LOADING_DURATION = 1500;
 
+    public static final int GALLERY_PICK_POST_IMAGE = 160;
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -170,5 +172,12 @@ public class Common {
 
     public static void hideSoftKeyboard() {
 
+    }
+
+    public static void openGallery (Activity activity, int code){
+        Intent galleryIntent = new Intent();
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        activity.startActivityForResult(galleryIntent,code);
     }
 }
