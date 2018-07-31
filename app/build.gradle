@@ -37,6 +37,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:11.8.0'
     implementation 'com.google.firebase:firebase-database:11.8.0'\
 
+    implementation 'com.google.firebase:firebase-storage:11.8.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.shawnlin:number-picker:2.4.6'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'

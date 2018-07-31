@@ -3,6 +3,7 @@ package com.spots.bella.activity.make_post;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +17,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.spots.bella.R;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
@@ -92,8 +99,31 @@ public class MakePostActivity extends BaseActivity {
             finish();
             return true;
         }
+        else if (id == R.id.menu_activity_post_share)
+        {
+            sharePost();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sharePost() {
+        String text = et_say_somthing.getText().toString().trim();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference post_images_file_path = storageRef.child(Common.STRING_POST_IMAGES).child(IMAGE_URI.getLastPathSegment()+System.currentTimeMillis()+".jpg");
+        post_images_file_path.putFile(IMAGE_URI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(context, "IMAGE UPLOADED", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onComplete: ERROR: "+task.getException().getMessage());
+                }
+            }
+        });
     }
 
 

@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.make_post.MakePostActivity"
     android:orientation="vertical"
-    >
+    tools:context=".activity.make_post.MakePostActivity">
 
     <LinearLayout
         android:id="@+id/activity_post_toolbar_container"
@@ -20,15 +19,21 @@
             layout="@layout/main_toolbar" />
     </LinearLayout>
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:progressDrawable="@drawable/custom_progressbar" />
+
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Say something about this photo..."
         android:id="@+id/et_activity_make_post"
-        />
-    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Say something about this photo..." />
+
+    <ImageView
         android:id="@+id/iv_activity_make_post"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
