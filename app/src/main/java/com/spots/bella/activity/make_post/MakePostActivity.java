@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,15 +29,13 @@ import com.spots.bella.R;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
 
-import java.net.URI;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.spots.bella.constants.Common.getStatusBarHeight;
 import static com.spots.bella.constants.Common.syncToolbar;
 
-public class MakePostActivity extends BaseActivity {
+public class MakePostActivity extends BaseActivity implements MakePostView {
     private static final String TAG = "MakePostActivity";
     private static Uri IMAGE_URI = null;
 
@@ -54,14 +53,18 @@ public class MakePostActivity extends BaseActivity {
     @BindView(R.id.iv_activity_make_post)
     ImageView iv_post_photo;
 
+    @BindView(R.id.progress_activity_post)
+    ProgressBar progress;
+
     MenuItem btn_share;
 
-
+    MakePostPresenter mPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_post);
         ButterKnife.bind(this);
+        mPresenter = new MakePostPresenterIMP(this,database,mFirebaseAuth);
         if (getIntent().getExtras() != null) {
             IMAGE_URI = getIntent().getParcelableExtra("post_image");
             Log.d(TAG, "onCreate: " + IMAGE_URI);
@@ -108,6 +111,7 @@ public class MakePostActivity extends BaseActivity {
     }
 
     private void sharePost() {
+
         String text = et_say_somthing.getText().toString().trim();
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference post_images_file_path = storageRef.child(Common.STRING_POST_IMAGES).child(IMAGE_URI.getLastPathSegment()+System.currentTimeMillis()+".jpg");

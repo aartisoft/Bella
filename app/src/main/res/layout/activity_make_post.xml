@@ -24,7 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:progressDrawable="@drawable/custom_progressbar" />
+        android:progressDrawable="@drawable/custom_progressbar"
+        android:id="@+id/progress_activity_post"
+        />
 
     <EditText
         android:id="@+id/et_activity_make_post"
