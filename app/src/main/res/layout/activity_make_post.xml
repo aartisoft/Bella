@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.make_post.MakePostActivity">
+    tools:context=".activity.make_post.MakePostActivity"
+    android:orientation="vertical"
+    >
 
     <LinearLayout
         android:id="@+id/activity_post_toolbar_container"

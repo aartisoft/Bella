@@ -74,7 +74,9 @@ public class MakePostActivity extends BaseActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_post_menu, menu);
         btn_share = menu.findItem(R.id.menu_activity_post_share);
-
+        if (IMAGE_URI != null) {
+            btn_share.setEnabled(true);
+        }
         return true;
     }
 
@@ -87,14 +89,16 @@ public class MakePostActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
-            onBackPressed();
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
     private void initViews() {
+        Log.d(TAG, "initViews: ");
         setupToolbar();
 
         et_say_somthing.addTextChangedListener(new TextWatcher() {
@@ -105,10 +109,13 @@ public class MakePostActivity extends BaseActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (IMAGE_URI != null) {
-                    if (et_say_somthing.getText().toString().length() < 2)
+                Log.d(TAG, "onTextChanged: ");
+                if (IMAGE_URI == null) {
+                    if (charSequence.length() >= 2)
+                        btn_share.setEnabled(true);
+                    else {
                         btn_share.setEnabled(false);
-                    btn_share.setEnabled(true);
+                    }
                 }
             }
 
@@ -118,14 +125,14 @@ public class MakePostActivity extends BaseActivity {
             }
         });
         if (IMAGE_URI != null) {
+            Log.d(TAG, "initViews: 1");
             iv_post_photo.setImageURI(IMAGE_URI);
             iv_post_photo.setVisibility(View.VISIBLE);
             et_say_somthing.setHint(context.getString(R.string.say_something_about_this_photo));
-            btn_share.setEnabled(true);
         } else {
+            Log.d(TAG, "initViews: 2");
             iv_post_photo.setVisibility(View.GONE);
             et_say_somthing.setHint(context.getString(R.string.what_is_on_your_mind));
-            btn_share.setEnabled(true);
         }
 
     }
