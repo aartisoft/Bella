@@ -1,5 +1,6 @@
 package com.spots.bella.activity.make_post;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import com.spots.bella.activity.make_post.MakePostInteractor.OnSharePostResponse
 public class MakePostPresenterIMP implements MakePostPresenter, OnSharePostResponseListener {
     private static final String TAG = "MakePostPresenterIMP";
     private final StorageReference mStorage;
+    private  Context context;
 
     private MakePostView mView;
     private final DatabaseReference database;
@@ -21,21 +23,23 @@ public class MakePostPresenterIMP implements MakePostPresenter, OnSharePostRespo
         this.mView = mView;
         this.database = database;
         this.mFirebaseAuth = mFirebaseAuth;
-        this.mInteractor = new MakePostInteractorIMP();
         this.mStorage = mStorage;
+        this.context = (Context) mView;
+        this.mInteractor = new MakePostInteractorIMP(context);
+
     }
 
     @Override
-    public void onSharePostClicked(String text, Uri imageUri) {
+    public void onSharePostClicked(String text, Uri imageUri, int image_count) {
         if (mView != null) {
-            mInteractor.sharePost(this,mFirebaseAuth,database,mStorage,text, imageUri);
+            mInteractor.sharePost(this, text, imageUri, image_count);
         }
     }
 
     @Override
     public void onSharePostClicked(String text) {
         if (mView!=null) {
-            mInteractor.sharePost(this,mFirebaseAuth,database,mStorage, text, null);
+            mInteractor.sharePost(this, text, null, 0);
         }
     }
 

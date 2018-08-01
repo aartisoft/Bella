@@ -1,68 +1,129 @@
 package com.spots.bella.activity.make_post;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.spots.bella.constants.Common;
+import com.spots.bella.constants.ImageManager;
+import com.spots.bella.constants.StringManipulation;
 import com.spots.bella.models.Photo;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 class MakePostInteractorIMP implements MakePostInteractor {
     private static final String TAG = "MakePostInteractorIMP";
+    private  Context context;
     private String timeStamp;
 
-    public MakePostInteractorIMP() {
+    public MakePostInteractorIMP(Context context) {
+        this.context=context;
     }
 
     @Override
-    public void sharePost(final OnSharePostResponseListener responseListener, final String caption, Uri imageUri) {
+    public void sharePost(final OnSharePostResponseListener responseListener, final String caption, Uri imageUri, final int image_count) {
         Log.d(TAG, "sharePost: IMAGE_URI = " + imageUri);
         Log.d(TAG, "sharePost: POST_TEXT = " + caption);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
         if (imageUri != null) { // POST WITH IMAGE
 
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-            StorageReference post_images_file_path = storageReference.child(Common.STRING_PHOTOS).child(imageUri.getLastPathSegment() + System.currentTimeMillis() + ".jpg");
-            post_images_file_path.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            // TODO: upload photo
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference()
+                    .child(Common.FIREBASE_IMAGE_STORAGE + "/" + uid + "/photo" + (image_count + 1));
+
+
+            Bitmap bm = ImageManager.getBitmap(imageUri,context);
+            byte[] bytes = ImageManager.getBytesFromBitmap(bm, 50);
+
+            UploadTask uploadTask = null;
+            uploadTask = storageReference.putBytes(bytes);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        Uri image_url = task.getResult().getDownloadUrl();
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d(TAG, "onSuccess: UPLOAD ");
+                    String image_url = String.valueOf(taskSnapshot.getDownloadUrl());
 //                        responseListener.onShareSuccess("Uploaded Success", 1);
-                        // add the new photo to 'photo' node and 'user_photos' node
-                        // navigate to the main feed so user can see their photo
-                        addPhotoToDatabase(caption, image_url);
-                    } else {
-                        responseListener.onShareFailure("Uploaded Fsiled!", task.getException().getMessage().toString());
-                        Log.d(TAG, "onComplete: ERROR: " + task.getException().getMessage());
+                    // add the new photo to 'photo' node and 'user_photos' node
+                    // navigate to the main feed so user can see their photo
+                    addPhotoToDatabase(caption, image_url, image_count);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure: UPLOAD");
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d(TAG, "onProgress: Progress...");
+                    double progress = (100*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount();
+                    if (progress-15>mPhotoUploadProgress) {
+                        Log.d(TAG, "onProgress: = "+String.format("%.0f", progress));
+                        mPhotoUploadProgress = progress;
                     }
+                    Log.d(TAG, "onProgress: upload progress "+progress+" % done");
                 }
             });
+
+
+
         } else // POST WITH TEXT
         {
 
         }
     }
+    double mPhotoUploadProgress = 0;
 
-    private void addPhotoToDatabase(String caption, String image_url) {
+    private void addPhotoToDatabase(String caption, String image_url, int image_count) {
         Log.d(TAG, "addPhotoToDatabase: Adding photo to database.");
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         String new_photo_key = databaseReference.child(Common.STRING_PHOTOS).push().getKey();
+
+        String tags = StringManipulation.getTags(caption);
         Photo photo = new Photo();
         photo.setCaption(caption);
         photo.setDate_created(getTimeStamp());
         photo.setImage_path(image_url);
+        photo.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        photo.setTags(tags);
+        photo.setPhoto_id(new_photo_key);
+
+        // insert into database
+        databaseReference.child(Common.USER_PHOTOS_STRING).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(photo);
+        databaseReference.child(Common.STRING_PHOTOS).child(new_photo_key).setValue(photo);
+
+// TODO: Conver image into bitmap
+
     }
 
     public String getTimeStamp() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Africa/Cairo"));
 
-        return timeStamp;
+        return simpleDateFormat.format(new Date());
     }
+
 }

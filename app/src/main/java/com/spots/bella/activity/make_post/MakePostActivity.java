@@ -19,7 +19,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.spots.bella.R;
+import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
 
 import butterknife.BindView;
@@ -52,18 +57,43 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
     MenuItem btn_share;
 
     MakePostPresenter mPresenter;
+    private int image_count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_post);
         ButterKnife.bind(this);
-        mPresenter = new MakePostPresenterIMP(this, mDatabase, mAuth,mStorage);
+        mPresenter = new MakePostPresenterIMP(this, mDatabase, mAuth, mStorage);
         if (getIntent().getExtras() != null) {
             IMAGE_URI = getIntent().getParcelableExtra("post_image");
             Log.d(TAG, "onCreate: " + IMAGE_URI);
         }
+        getImageCount();
         initViews();
+    }
+
+    private void getImageCount() {
+        if (IMAGE_URI!=null) {
+            mDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int count = 0;
+                    for (DataSnapshot child : dataSnapshot.child(Common.STRING_PHOTOS).child(mAuth.getCurrentUser()
+                            .getUid()).getChildren()){
+                        count++;
+                        Log.d(TAG, "onDataChange: Image count = "+count);
+                    }
+                    image_count = count;
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
     }
 
     @Override
@@ -104,7 +134,7 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
 
     private void sharePost() {
         String text = et_say_somthing.getText().toString().trim();
-        mPresenter.onSharePostClicked(text,IMAGE_URI);
+        mPresenter.onSharePostClicked(text, IMAGE_URI, image_count);
 //        mPresenter.onSharePostClicked(text);
     }
 

@@ -1,10 +1,7 @@
 package com.spots.bella.activity.make_post;
 
+import android.content.Context;
 import android.net.Uri;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.storage.StorageReference;
 
 interface MakePostInteractor {
     interface OnSharePostResponseListener {
@@ -15,6 +12,6 @@ interface MakePostInteractor {
         void onShareSuccess(String message, int code);
     }
 
-    void sharePost(OnSharePostResponseListener responseListener, String text, Uri imageUri);
+    void sharePost( OnSharePostResponseListener responseListener, String text, Uri imageUri, int image_count);
 
 }

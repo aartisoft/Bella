@@ -37,6 +37,8 @@ public class Common {
     public static final int LOADING_DURATION = 1500;
 
     public static final int GALLERY_PICK_POST_IMAGE = 160;
+    public static final String FIREBASE_IMAGE_STORAGE = "photos/users";
+    public static final String USER_PHOTOS_STRING = "user_photos";
     public static final String STRING_PHOTOS = "photos";
 
     public static void darkStatusBarSetup(Window window) {
