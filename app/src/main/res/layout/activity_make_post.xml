@@ -26,6 +26,7 @@
         android:indeterminate="true"
         android:progressDrawable="@drawable/custom_progressbar"
         android:id="@+id/progress_activity_post"
+        android:visibility="gone"
         />
 
     <EditText

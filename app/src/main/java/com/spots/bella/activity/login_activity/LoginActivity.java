@@ -37,7 +37,6 @@ import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment;
 import com.spots.bella.activity.login_activity.fragments.ForgotPasswordFragment.OnForgotPasswordFragmentInteractionListener;
 import com.spots.bella.activity.login_activity.fragments.LoginFragment;
 import com.spots.bella.activity.login_activity.fragments.RegisterationFragment;
-import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment;
 import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment.OnResetPasswordFragmentInteractionListener;
 import com.spots.bella.constants.Common;
 import com.spots.bella.constants.Utils;
@@ -81,13 +80,13 @@ public class LoginActivity extends BaseActivity implements
     }
 
     private void initFirebase() {
-        DatabaseReference users = database.child(Common.USER_STRING);
+        DatabaseReference users = mDatabase.child(Common.USER_STRING);
         artist_users_ref = users.child(ARTIST_STRING);
         normal_users_ref = users.child(NORMAL_USER_STRING);
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) { // USER SIGNED IN // show login
                     Log.d(TAG, "onAuthStateChanged: 1");
                     BaseUser user_logged_in = Common.getUserData(pM); // check saved user data
@@ -127,11 +126,11 @@ public class LoginActivity extends BaseActivity implements
 
     private void sendEmailVerfication() {
         Log.d(TAG, "sendEmailVerfication: ");
-        mFirebaseAuth.getCurrentUser()
+        mAuth.getCurrentUser()
                 .sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: ");
+                Log.d(TAG, "onShareSuccess: ");
                 isVerficationSent = true;
                 hideDialog(dialog);
                 showLoginFragment();
@@ -141,7 +140,7 @@ public class LoginActivity extends BaseActivity implements
             @Override
             public void onFailure(@NonNull Exception e) {
                 hideDialog(dialog);
-                Log.d(TAG, "onFailure: " + e.getMessage());
+                Log.d(TAG, "onShareFailure: " + e.getMessage());
                 showShortMessage("An error occurred!", findViewById(android.R.id.content));
             }
         });
@@ -150,13 +149,13 @@ public class LoginActivity extends BaseActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mFirebaseAuth.addAuthStateListener(mFirebaseAuthListener);
+        mAuth.addAuthStateListener(mFirebaseAuthListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mFirebaseAuth.removeAuthStateListener(mFirebaseAuthListener);
+        mAuth.removeAuthStateListener(mFirebaseAuthListener);
     }
 
     private void showLoginFragment() {
@@ -188,11 +187,11 @@ public class LoginActivity extends BaseActivity implements
             @Override
             public void run() {
 
-                mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                mAuth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(final AuthResult authResult) {
-                                Log.d(TAG, "onSuccess: LOGIN");
+                                Log.d(TAG, "onShareSuccess: LOGIN");
                                 artist_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -267,7 +266,7 @@ public class LoginActivity extends BaseActivity implements
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: LOGIN: msg = " + e.getMessage());
+                                Log.d(TAG, "onShareFailure: LOGIN: msg = " + e.getMessage());
                                 hideDialog(dialog);
                                 if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
                                     showShortMessage("Check network connection!", findViewById(android.R.id.content));
@@ -352,7 +351,7 @@ public class LoginActivity extends BaseActivity implements
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
@@ -369,8 +368,8 @@ public class LoginActivity extends BaseActivity implements
                                 final String userId = authResult.getUser().getUid();
                                 String token_id = FirebaseInstanceId.getInstance().getToken();
 
-                                Log.d(TAG, "onSuccess:Register UID = " + userId);
-                                Log.d(TAG, "onSuccess:Register TID = " + token_id);
+                                Log.d(TAG, "onShareSuccess:Register UID = " + userId);
+                                Log.d(TAG, "onShareSuccess:Register TID = " + token_id);
                                 // use uid as key of childs
                                 ref.child(authResult.getUser().getUid())
                                         .setValue(user)
@@ -378,7 +377,7 @@ public class LoginActivity extends BaseActivity implements
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 hideDialog(dialog);
-                                                Log.d(TAG, "onSuccess:Register added to db 1.1 ");
+                                                Log.d(TAG, "onShareSuccess:Register added to db 1.1 ");
                                                 //
                                                 if (TextUtils.equals(type_u, NORMAL_USER_STRING)) { // normal user register done
                                                     showShortMessage("Registration finished, login now", findViewById(android.R.id.content));
@@ -396,7 +395,7 @@ public class LoginActivity extends BaseActivity implements
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 hideDialog(dialog);
-                                                Log.d(TAG, "onFailure:Register Saving to db : 1.2" + e.getMessage());
+                                                Log.d(TAG, "onShareFailure:Register Saving to db : 1.2" + e.getMessage());
                                                 if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
                                                     showShortMessage("Check network connection!", findViewById(android.R.id.content));
                                                 } else {
@@ -410,7 +409,7 @@ public class LoginActivity extends BaseActivity implements
                     public void onFailure(@NonNull Exception e) {
                         hideDialog(dialog);
                         showShortMessage("Registeration Failed - log it", findViewById(android.R.id.content));
-                        Log.d(TAG, "onFailure: Registration : 1.3" + e.getMessage());
+                        Log.d(TAG, "onShareFailure: Registration : 1.3" + e.getMessage());
                         String error_msg = e.getMessage();
                         if (error_msg.contains("email address is already in use by another account")) {   // EMAIL ALREADY USED!
                             showShortMessage("email is already used", findViewById(android.R.id.content));
@@ -469,14 +468,14 @@ public class LoginActivity extends BaseActivity implements
                                     showShortMessage("Registration finished, login now", findViewById(android.R.id.content));
                                     Common.clearBackStackFragments(getSupportFragmentManager());
                                     showLoginFragment();
-                                    Log.d(TAG, "onSuccess: added to db");
+                                    Log.d(TAG, "onShareSuccess: added to db");
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     Common.hideDialog(dialog);
-                                    Log.d(TAG, "onFailure: failed to add data to db EXCEPTION msg = " + e.getMessage());
+                                    Log.d(TAG, "onShareFailure: failed to add data to db EXCEPTION msg = " + e.getMessage());
                                     if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
                                         showShortMessage("Check network connection!", findViewById(android.R.id.content));
                                     } else {
@@ -559,10 +558,10 @@ public class LoginActivity extends BaseActivity implements
 
     private void sendResetPasswordEmail(final String email) {
         Log.d(TAG, "sendResetPasswordEmail: ");
-        mFirebaseAuth.sendPasswordResetEmail(email).addOnSuccessListener(new OnSuccessListener<Void>() {
+        mAuth.sendPasswordResetEmail(email).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: ");
+                Log.d(TAG, "onShareSuccess: ");
                 showLoginFragment();
                 hideDialog(dialog);
                 showShortMessage("Reset E-Mail sent", findViewById(android.R.id.content));
@@ -571,7 +570,7 @@ public class LoginActivity extends BaseActivity implements
             @Override
             public void onFailure(@NonNull Exception e) {
                 hideDialog(dialog);
-                Log.d(TAG, "onFailure: " + e.getMessage());
+                Log.d(TAG, "onShareFailure: " + e.getMessage());
                 Toast.makeText(context, "Error occured " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

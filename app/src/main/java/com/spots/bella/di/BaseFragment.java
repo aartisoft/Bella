@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.spots.bella.PreferenceManager;
 
@@ -20,14 +21,17 @@ public class BaseFragment extends Fragment {
     public PreferenceManager pM;
 
     @Inject
-    public Gson gson;
+    public Gson mGson;
 
 
     @Inject
-    public FirebaseAuth mFirebaseAuth;
+    public FirebaseAuth mAuth;
 
     @Inject
-    public DatabaseReference database;
+    public DatabaseReference mDatabase;
+
+    @Inject
+    public StorageReference mStorage;
 
     @Override
     public void onAttach(Context context) {

@@ -5,4 +5,7 @@ interface MakePostView {
     void hidePregress();
     void showImageView();
     void hideIamgeView();
+
+    void showMessage(String message, int code);
+    void showMessage(String message, String msg);
 }

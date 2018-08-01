@@ -3,7 +3,6 @@ package com.spots.bella.activity.make_post;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,13 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.spots.bella.R;
-import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
 
 import butterknife.BindView;
@@ -59,12 +52,13 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
     MenuItem btn_share;
 
     MakePostPresenter mPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_post);
         ButterKnife.bind(this);
-        mPresenter = new MakePostPresenterIMP(this,database,mFirebaseAuth);
+        mPresenter = new MakePostPresenterIMP(this, mDatabase, mAuth,mStorage);
         if (getIntent().getExtras() != null) {
             IMAGE_URI = getIntent().getParcelableExtra("post_image");
             Log.d(TAG, "onCreate: " + IMAGE_URI);
@@ -101,9 +95,7 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
         if (id == android.R.id.home) {
             finish();
             return true;
-        }
-        else if (id == R.id.menu_activity_post_share)
-        {
+        } else if (id == R.id.menu_activity_post_share) {
             sharePost();
         }
 
@@ -111,23 +103,9 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
     }
 
     private void sharePost() {
-
         String text = et_say_somthing.getText().toString().trim();
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference post_images_file_path = storageRef.child(Common.STRING_POST_IMAGES).child(IMAGE_URI.getLastPathSegment()+System.currentTimeMillis()+".jpg");
-        post_images_file_path.putFile(IMAGE_URI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(context, "IMAGE UPLOADED", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onComplete: ERROR: "+task.getException().getMessage());
-                }
-            }
-        });
+        mPresenter.onSharePostClicked(text,IMAGE_URI);
+//        mPresenter.onSharePostClicked(text);
     }
 
 
@@ -191,5 +169,41 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
                 toolbar_container.setLayoutParams(params);
             }
         }
+    }
+
+    @Override
+    public void showPregress() {
+        progress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hidePregress() {
+        progress.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showImageView() {
+        iv_post_photo.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideIamgeView() {
+        iv_post_photo.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showMessage(String message, int code) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showMessage(String message, String msg) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDestroy();
     }
 }

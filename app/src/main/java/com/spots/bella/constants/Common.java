@@ -37,7 +37,7 @@ public class Common {
     public static final int LOADING_DURATION = 1500;
 
     public static final int GALLERY_PICK_POST_IMAGE = 160;
-    public static final String STRING_POST_IMAGES = "Post Images";
+    public static final String STRING_PHOTOS = "photos";
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {

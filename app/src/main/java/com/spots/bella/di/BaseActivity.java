@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
@@ -28,12 +29,15 @@ public class BaseActivity extends AppCompatActivity {
     public PreferenceManager pM;
 
     @Inject
-    public Gson gson;
+    public Gson mGson;
 
     @Inject
-    public DatabaseReference database;
+    public DatabaseReference mDatabase;
     @Inject
-    public FirebaseAuth mFirebaseAuth;
+    public FirebaseAuth mAuth;
+    @Inject
+    public StorageReference mStorage;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
