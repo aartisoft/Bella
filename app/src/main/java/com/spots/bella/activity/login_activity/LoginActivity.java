@@ -231,12 +231,12 @@ public class LoginActivity extends BaseActivity implements
                                                         // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
                                                         // TODO : check email validation
                                                         if (authResult.getUser().isEmailVerified()) { // verified go home
-                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED!");
+                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED!");
                                                             startActivity(new Intent(LoginActivity.this, WizardActivity.class));
                                                             finish();
                                                         } else // not verified show verification fragment
                                                         {
-                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED");
+                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED");
                                                             showEmailVerificationFragment();
                                                         }
                                                     } else {

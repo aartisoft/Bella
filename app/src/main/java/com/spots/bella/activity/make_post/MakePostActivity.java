@@ -74,17 +74,18 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
     }
 
     private void getImageCount() {
-        if (IMAGE_URI!=null) {
+        if (IMAGE_URI != null) {
             mDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     int count = 0;
-                    for (DataSnapshot child : dataSnapshot.child(Common.STRING_PHOTOS).child(mAuth.getCurrentUser()
-                            .getUid()).getChildren()){
+                    for (DataSnapshot child : dataSnapshot.child(Common.USER_PHOTOS_STRING).child(mAuth.getCurrentUser()
+                            .getUid()).getChildren()) {
                         count++;
-                        Log.d(TAG, "onDataChange: Image count = "+count);
+                        Log.d(TAG, "onDataChange: Image count = " + count+" child = "+child.getValue());
                     }
                     image_count = count;
+                    Log.d(TAG, "onDataChange: count = " + image_count);
                 }
 
                 @Override
@@ -93,7 +94,6 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
                 }
             });
         }
-
     }
 
     @Override
@@ -227,8 +227,14 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
     }
 
     @Override
-    public void showMessage(String message, String msg) {
+    public void showMessage(String message, String err_msg) {
+        Log.e(TAG, "showMessage: " + err_msg);
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void closeActivity() {
+        finish();
     }
 
     @Override

@@ -32,17 +32,18 @@ import java.util.TimeZone;
 
 class MakePostInteractorIMP implements MakePostInteractor {
     private static final String TAG = "MakePostInteractorIMP";
-    private  Context context;
+    private Context context;
     private String timeStamp;
 
     public MakePostInteractorIMP(Context context) {
-        this.context=context;
+        this.context = context;
     }
 
     @Override
     public void sharePost(final OnSharePostResponseListener responseListener, final String caption, Uri imageUri, final int image_count) {
         Log.d(TAG, "sharePost: IMAGE_URI = " + imageUri);
         Log.d(TAG, "sharePost: POST_TEXT = " + caption);
+        Log.d(TAG, "sharePost: IMAGE_COUNT = " + image_count);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
         if (imageUri != null) { // POST WITH IMAGE
@@ -53,7 +54,7 @@ class MakePostInteractorIMP implements MakePostInteractor {
                     .child(Common.FIREBASE_IMAGE_STORAGE + "/" + uid + "/photo" + (image_count + 1));
 
 
-            Bitmap bm = ImageManager.getBitmap(imageUri,context);
+            Bitmap bm = ImageManager.getBitmap(imageUri, context);
             byte[] bytes = ImageManager.getBytesFromBitmap(bm, 50);
 
             UploadTask uploadTask = null;
@@ -66,27 +67,27 @@ class MakePostInteractorIMP implements MakePostInteractor {
 //                        responseListener.onShareSuccess("Uploaded Success", 1);
                     // add the new photo to 'photo' node and 'user_photos' node
                     // navigate to the main feed so user can see their photo
-                    addPhotoToDatabase(caption, image_url, image_count);
+                    addPhotoToDatabase(caption, image_url, responseListener);
 
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.d(TAG, "onFailure: UPLOAD");
+                    responseListener.onShareFailure("Failed to post!", e.getMessage());
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                     Log.d(TAG, "onProgress: Progress...");
-                    double progress = (100*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount();
-                    if (progress-15>mPhotoUploadProgress) {
-                        Log.d(TAG, "onProgress: = "+String.format("%.0f", progress));
+                    double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    if (progress - 15 > mPhotoUploadProgress) {
+                        Log.d(TAG, "onProgress: = " + String.format("%.0f", progress));
                         mPhotoUploadProgress = progress;
                     }
-                    Log.d(TAG, "onProgress: upload progress "+progress+" % done");
+                    Log.d(TAG, "onProgress: upload progress " + progress + " % done");
                 }
             });
-
 
 
         } else // POST WITH TEXT
@@ -94,9 +95,10 @@ class MakePostInteractorIMP implements MakePostInteractor {
 
         }
     }
+
     double mPhotoUploadProgress = 0;
 
-    private void addPhotoToDatabase(String caption, String image_url, int image_count) {
+    private void addPhotoToDatabase(String caption, String image_url, OnSharePostResponseListener responseListener) {
         Log.d(TAG, "addPhotoToDatabase: Adding photo to database.");
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -112,15 +114,16 @@ class MakePostInteractorIMP implements MakePostInteractor {
         photo.setPhoto_id(new_photo_key);
 
         // insert into database
-        databaseReference.child(Common.USER_PHOTOS_STRING).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(photo);
+        databaseReference.child(Common.USER_PHOTOS_STRING).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).push().setValue(photo);
         databaseReference.child(Common.STRING_PHOTOS).child(new_photo_key).setValue(photo);
+        Log.d(TAG, "addPhotoToDatabase: finish");
 
-// TODO: Conver image into bitmap
+        responseListener.onShareSuccess("Image shared successfully");
 
     }
 
     public String getTimeStamp() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'z'", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Africa/Cairo"));
 
         return simpleDateFormat.format(new Date());

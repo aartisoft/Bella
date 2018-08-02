@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.spots.bella.PreferenceManager;
+import com.spots.bella.constants.FirebaseMethods;
 
 import javax.inject.Inject;
 
@@ -22,7 +23,6 @@ public class BaseFragment extends Fragment {
 
     @Inject
     public Gson mGson;
-
 
     @Inject
     public FirebaseAuth mAuth;

@@ -9,7 +9,7 @@ interface MakePostInteractor {
         void onShareFailure(String message, int code);
         void onShareFailure(String message, String error_msg);
 
-        void onShareSuccess(String message, int code);
+        void onShareSuccess(String message);
     }
 
     void sharePost( OnSharePostResponseListener responseListener, String text, Uri imageUri, int image_count);

@@ -67,9 +67,10 @@ public class MakePostPresenterIMP implements MakePostPresenter, OnSharePostRespo
     }
 
     @Override
-    public void onShareSuccess(String message, int code) {
-        if (mView != null) {
-            Log.d(TAG, "onShareSuccess: ");
+    public void onShareSuccess(String message) {
+        if (mView!=null) {
+            mView.closeActivity();
         }
     }
+
 }

@@ -8,4 +8,6 @@ interface MakePostView {
 
     void showMessage(String message, int code);
     void showMessage(String message, String msg);
+
+    void closeActivity();
 }
