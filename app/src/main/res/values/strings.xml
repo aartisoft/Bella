@@ -48,6 +48,8 @@
     <string name="create_post">Create Post</string>
     <string name="say_something_about_this_photo">Say something about this photo...</string>
     <string name="what_is_on_your_mind">What\'s on your mind?</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="sign_out">Sign Out</string>
 
     <!--  <string-array name="governoments">
         <item>الإسكندرية</item>

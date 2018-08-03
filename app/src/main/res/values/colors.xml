@@ -6,7 +6,12 @@
     <color name="blue">#7CB8DD</color>
     <color name="burble">#BC6CB3</color>
     <color name="dark_burble">#7D2674</color>
-    <color name="black">#000000</color>
     <color name="slider_dot_active">#ffffff</color>
     <color name="slider_dot_inactive">#787777</color>
+
+    <color name="grey">#bfbfbf</color>
+    <color name="white">#fff</color>
+    <color name="black">#000000</color>
+    <color name="link_blue">#4d94ff</color>
+    <color name="darkRed">#cc0000</color>
 </resources>
