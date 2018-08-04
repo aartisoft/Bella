@@ -86,7 +86,7 @@ public class LoginActivity extends BaseActivity implements
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = mAuth.getCurrentUser();
+                final FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) { // USER SIGNED IN // show login
                     Log.d(TAG, "onAuthStateChanged: 1 User signed in.");
                     BaseUser user_logged_in = Common.getUserData(pM); // check saved user data
@@ -215,6 +215,7 @@ public class LoginActivity extends BaseActivity implements
                                                 startActivity(new Intent(LoginActivity.this, WizardActivity.class));
                                                 finish();
                                             } else {
+                                                mAuth.signOut();
                                                 showEmailVerificationFragment();
                                             }
 
@@ -393,12 +394,12 @@ public class LoginActivity extends BaseActivity implements
                                                             while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                                                                 getSupportFragmentManager().popBackStackImmediate();
                                                             }
+                                                            sendEmailVerfication();
                                                             showLoginFragment();
                                                         } else { // artist user register done
                                                             showArtistQuestionsFragment(userId, user);
                                                         }
 
-                                                        sendEmailVerfication();
                                                     }
                                                 })
                                                 .addOnFailureListener(new OnFailureListener() {
@@ -504,6 +505,7 @@ public class LoginActivity extends BaseActivity implements
                                     Common.hideDialog(dialog);
                                     showShortMessage("Registration finished, login now", findViewById(android.R.id.content));
                                     Common.clearBackStackFragments(getSupportFragmentManager());
+                                    sendEmailVerfication();
                                     showLoginFragment();
                                     Log.d(TAG, "onShareSuccess: added to db");
                                 }
@@ -592,6 +594,12 @@ public class LoginActivity extends BaseActivity implements
         }, Common.LOADING_DURATION);
     }
 
+    @Override
+    public void onLoginBtnClicked() {
+        Log.d(TAG, "onLoginBtnClicked: ");
+        showLoginFragment();
+    }
+
 
     private void sendResetPasswordEmail(final String email) {
         Log.d(TAG, "sendResetPasswordEmail: ");
@@ -617,11 +625,6 @@ public class LoginActivity extends BaseActivity implements
     @Override
     public void onResetPasswordFragmentOpened() {
         Log.d(TAG, "onResetPasswordFragmentOpened: ");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override

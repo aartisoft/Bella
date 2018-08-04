@@ -75,10 +75,17 @@ public class AccountValidationFragment extends Fragment {
     public void send_verification() {
         mListener.onVerificationClicked();
     }
-    
+
+    @OnClick(R.id.btn_resend_code_fragment_login)
+    public void login() {
+        mListener.onLoginBtnClicked();
+    }
+
     public interface OnEmailVerificationFragmentInteractionListener {
         void onEmailVerificationFragmentOpened();
 
         void onVerificationClicked();
-        }
+
+        void onLoginBtnClicked();
+    }
 }
