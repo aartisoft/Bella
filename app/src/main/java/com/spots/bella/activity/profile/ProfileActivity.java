@@ -3,10 +3,12 @@ package com.spots.bella.activity.profile;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -34,7 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.profile_photo)
     CircleImageView profile_photo;
 
-    @BindView(R.id.gridView)
+    @BindView(R.id.profileGride)
     GridView gide_view;
 
     @Override

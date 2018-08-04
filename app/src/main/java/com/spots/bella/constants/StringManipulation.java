@@ -1,31 +1,45 @@
 package com.spots.bella.constants;
 
-import org.apache.commons.lang3.text.StrBuilder;
+import android.util.Log;
+
+/**
+ * Created by User on 6/26/2017.
+ */
 
 public class StringManipulation {
-    public static String getTags(String s) {
-        if (s.indexOf("#") > 0) {
+    private static final String TAG = "StringManipulation";
+
+    public static String expandUsername(String username){
+        Log.d(TAG, "expandUsername: username = "+username);
+        return username.replace(".", " ");
+    }
+
+    public static String condenseUsername(String username){
+        return username.replace(" " , ".");
+    }
+
+    public static String getTags(String string){
+        if(string.indexOf("#") > 0){
             StringBuilder sb = new StringBuilder();
-            char[] charArray = s.toCharArray();
+            char[] charArray = string.toCharArray();
             boolean foundWord = false;
-            for (char c : charArray) {
-                if (c == '#') {
+            for( char c : charArray){
+                if(c == '#'){
                     foundWord = true;
                     sb.append(c);
-                } else {
-                    if (foundWord) {
+                }else{
+                    if(foundWord){
                         sb.append(c);
                     }
                 }
-                if (c == ' '
-                        ) {
+                if(c == ' ' ){
                     foundWord = false;
                 }
             }
-            String s1 = sb.toString().replace(" ","").replace("#",",#");
-            return s1.substring(1,s1.length());
+            String s = sb.toString().replace(" ", "").replace("#", ",#");
+            return s.substring(1, s.length());
         }
-        return s;
+        return string;
     }
-    /*In -> #tag2,#tag3*/
+
 }

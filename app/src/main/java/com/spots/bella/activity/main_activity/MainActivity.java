@@ -86,7 +86,7 @@ public class MainActivity extends BaseActivity
 
         initViews();
 
-//        Toast.makeText(context, "Welcome " + pM.readeString(PreferenceManager.USER_TYPE) + " " + pM.readeString(PreferenceManager.USER_FIRST_NAME), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "Welcome " + pM.readeString(PreferenceManager.USER_TYPE) + " " + pM.readeString(PreferenceManager.USER_FULL_NAME), Toast.LENGTH_SHORT).show();
 
     }
 

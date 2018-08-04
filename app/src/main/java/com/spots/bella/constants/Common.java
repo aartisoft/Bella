@@ -3,7 +3,6 @@ package com.spots.bella.constants;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
@@ -13,7 +12,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -40,6 +38,7 @@ public class Common {
     public static final String FIREBASE_IMAGE_STORAGE = "photos/users";
     public static final String USER_PHOTOS_STRING = "user_photos";
     public static final String STRING_PHOTOS = "photos";
+    public static final String USER_ACCOUNT_SETTINGS = "user_account_settings";
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {
@@ -128,7 +127,7 @@ public class Common {
 
     public static BaseUser getUserData(PreferenceManager pM) {
         BaseUser currentUser;
-        String first_name = pM.readeString(PreferenceManager.USER_FIRST_NAME);
+        String first_name = pM.readeString(PreferenceManager.USER_FULL_NAME);
         String last_name = pM.readeString(PreferenceManager.USER_LAST_NAME);
         String email = pM.readeString(PreferenceManager.USER_EMAIL);
         String password = pM.readeString(PreferenceManager.USER_PASSWORD);
@@ -142,8 +141,7 @@ public class Common {
             return null;
         } else {
             currentUser = new BaseUser();
-            currentUser.setFrist_name(first_name);
-            currentUser.setLast_name(last_name);
+            currentUser.setFull_name(first_name);
             currentUser.setEmail(email);
             currentUser.setPassword(password);
             currentUser.setPhone(phone);
@@ -152,9 +150,8 @@ public class Common {
         }
     }
 
-    public static void saveUserData(PreferenceManager pM, String first_name, String last_name, String email, String password, String user_phone, String user_type, MoreDetailsUserArtist moreDetails) {
-        pM.writeSharedPrefrenceString(PreferenceManager.USER_FIRST_NAME, first_name);
-        pM.writeSharedPrefrenceString(PreferenceManager.USER_LAST_NAME, last_name);
+    public static void saveUserData(PreferenceManager pM, String full_name, String email, String password, String user_phone, String user_type, MoreDetailsUserArtist moreDetails) {
+        pM.writeSharedPrefrenceString(PreferenceManager.USER_FULL_NAME, full_name);
         pM.writeSharedPrefrenceString(PreferenceManager.USER_EMAIL, email);
         pM.writeSharedPrefrenceString(PreferenceManager.USER_PASSWORD, password);
         pM.writeSharedPrefrenceString(PreferenceManager.USER_PHONE, user_phone);
@@ -178,10 +175,10 @@ public class Common {
 
     }
 
-    public static void openGallery (Activity activity, int code){
+    public static void openGallery(Activity activity, int code) {
         Intent galleryIntent = new Intent();
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
-        activity.startActivityForResult(galleryIntent,code);
+        activity.startActivityForResult(galleryIntent, code);
     }
 }

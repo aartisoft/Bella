@@ -25,8 +25,6 @@ import com.spots.bella.constants.OnKeyboardVisibilityListener;
 import com.spots.bella.constants.Utils;
 import com.spots.bella.di.BaseFragment;
 
-import java.util.regex.Pattern;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -52,12 +50,12 @@ public class RegisterationFragment extends BaseFragment implements OnKeyboardVis
     @BindView(R.id.iv_user_register_fragment_logo)
     CircleImageView iv_user_register_fragment_logo;
 
-    @BindView(R.id.et_first_name_register_fragment)
-    TextInputEditText et_first_name;
+    @BindView(R.id.et_full_name_register_fragment)
+    TextInputEditText et_full_name;
 
-    @BindView(R.id.et_last_name_register_fragment)
+    /*@BindView(R.id.et_last_name_register_fragment)
     TextInputEditText et_last_name;
-
+*/
     @BindView(R.id.et_email_register_fragment)
     TextInputEditText et_email;
 
@@ -144,24 +142,24 @@ public class RegisterationFragment extends BaseFragment implements OnKeyboardVis
 
     public void isFieldsValid() {
 
-        String first_name, last_name, phone, email, password, password_confirmation;
-        first_name = et_first_name.getText().toString().trim();
-        last_name = et_last_name.getText().toString().trim();
+        String full_name, phone, email, password, password_confirmation;
+        full_name = et_full_name.getText().toString().trim();
+//        last_name = et_last_name.getText().toString().trim();
         phone = et_phone.getText().toString().trim();
         email = et_email.getText().toString().trim();
         password = et_password.getText().toString();
         password_confirmation = et_password_confirmation.getText().toString();
 
-        if (isWordContainsDigit(first_name)|| TextUtils.isEmpty(first_name)|| first_name.length()<2) {
-            Common.showShortMessage("Invalid First Name!", getActivity().findViewById(android.R.id.content));
+        if (isWordContainsDigit(full_name) || TextUtils.isEmpty(full_name) || full_name.length() < 2) {
+            Common.showShortMessage("Invalid Name!", getActivity().findViewById(android.R.id.content));
             Log.d(TAG, "isFieldsValid: first_name problem");
             return;
         }
-        if (isWordContainsDigit(last_name)|| TextUtils.isEmpty(last_name)|| last_name.length()<2) {
-            Common.showShortMessage("Invalid Last Name!", getActivity().findViewById(android.R.id.content));
-            Log.d(TAG, "isFieldsValid: first_name problem");
-            return;
-        }
+//        if (isWordContainsDigit(last_name)|| TextUtils.isEmpty(last_name)|| last_name.length()<2) {
+//            Common.showShortMessage("Invalid Last Name!", getActivity().findViewById(android.R.id.content));
+//            Log.d(TAG, "isFieldsValid: first_name problem");
+//            return;
+//        }
         if (!phonePattern.matcher(phone).matches()) {
             Common.showShortMessage("Invalid Phone Number!", getActivity().findViewById(android.R.id.content));
             Log.d(TAG, "isFieldsValid: Phone not match");
@@ -190,9 +188,9 @@ public class RegisterationFragment extends BaseFragment implements OnKeyboardVis
             return;
         }
         if (Utils.isNetworkAvailable(context)) {
-            mListener.onRegisterNextBtnClicked(capitalizeFristLetter(first_name), capitalizeFristLetter(last_name), email, phone, password, USER_TYPE); // data true => Register
-        }
-        else Common.showShortMessage("No internet connection!", getActivity().findViewById(android.R.id.content));
+            mListener.onRegisterNextBtnClicked(capitalizeFristLetter(full_name), email, phone, password, USER_TYPE); // data true => Register
+        } else
+            Common.showShortMessage("No internet connection!", getActivity().findViewById(android.R.id.content));
 
 
     }
@@ -202,7 +200,7 @@ public class RegisterationFragment extends BaseFragment implements OnKeyboardVis
         // TODO: Update argument type and name
         void onRegisterFragmentOpened();
 
-        void onRegisterNextBtnClicked(String first_name, String last_name, String email, String phone, String password, int TYPE);
+        void onRegisterNextBtnClicked(String first_name, String email, String phone, String password, int TYPE);
     }
 
     private void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {

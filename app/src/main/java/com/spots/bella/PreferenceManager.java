@@ -11,7 +11,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class PreferenceManager {
-    public static final String USER_FIRST_NAME = "user_first_name";
+    public static final String USER_FULL_NAME = "user_full_name";
     public static final String USER_LAST_NAME = "user_type";
     public static final String USER_EMAIL = "user_email";
     public static final String USER_PASSWORD = "user_password";

@@ -39,12 +39,14 @@ import com.spots.bella.activity.login_activity.fragments.LoginFragment;
 import com.spots.bella.activity.login_activity.fragments.RegisterationFragment;
 import com.spots.bella.activity.login_activity.fragments.ResetPasswordFragment.OnResetPasswordFragmentInteractionListener;
 import com.spots.bella.constants.Common;
+import com.spots.bella.constants.StringManipulation;
 import com.spots.bella.constants.Utils;
 import com.spots.bella.di.BaseActivity;
 import com.spots.bella.models.ArtistUser;
 import com.spots.bella.models.BaseUser;
 import com.spots.bella.models.MoreDetailsUserArtist;
 import com.spots.bella.models.NormalUser;
+import com.spots.bella.models.UserAccountSettings;
 
 import static com.spots.bella.activity.login_activity.fragments.ArtistQuestionsFragment.*;
 import static com.spots.bella.activity.login_activity.fragments.DetectRegisterationFragment.*;
@@ -67,28 +69,26 @@ public class LoginActivity extends BaseActivity implements
         OnRegisterFragmentInteractionListener {
 
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-    private DatabaseReference normal_users_ref;
-    private DatabaseReference artist_users_ref;
+
     private boolean isVerficationSent;
+    DatabaseReference users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         darkStatusBarSetup(getWindow());
         setContentView(R.layout.activity_login);
-        initFirebase();
+        initFirebaseAuth();
     }
 
-    private void initFirebase() {
-        DatabaseReference users = mDatabase.child(Common.USER_STRING);
-        artist_users_ref = users.child(ARTIST_STRING);
-        normal_users_ref = users.child(NORMAL_USER_STRING);
+    private void initFirebaseAuth() {
+        users = mDatabase.child(Common.USER_STRING);
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) { // USER SIGNED IN // show login
-                    Log.d(TAG, "onAuthStateChanged: 1");
+                    Log.d(TAG, "onAuthStateChanged: 1 User signed in.");
                     BaseUser user_logged_in = Common.getUserData(pM); // check saved user data
                     if (user_logged_in == null) { // USER SIGNED IN BUT APP'S DATA CLEARED // problem in saved data
                         Log.d(TAG, "onAuthStateChanged: 2");
@@ -109,14 +109,13 @@ public class LoginActivity extends BaseActivity implements
                                 showLoginFragment();
                             } else {
                                 showEmailVerificationFragment();
-
                             }
                         }
 
                     }
                 } else // USER NOT SIGNED IN
                 {
-                    Log.d(TAG, "onAuthStateChanged: 4");
+                    Log.d(TAG, "onAuthStateChanged: 4 user signed out.");
                     showLoginFragment();
                 }
             }
@@ -131,6 +130,7 @@ public class LoginActivity extends BaseActivity implements
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG, "onShareSuccess: ");
+                mAuth.signOut();
                 isVerficationSent = true;
                 hideDialog(dialog);
                 showLoginFragment();
@@ -192,18 +192,23 @@ public class LoginActivity extends BaseActivity implements
                             @Override
                             public void onSuccess(final AuthResult authResult) {
                                 Log.d(TAG, "onShareSuccess: LOGIN");
-                                artist_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                users.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         ArtistUser artistUser = null;
+                                        NormalUser normalUser = null;
                                         for (DataSnapshot child : dataSnapshot.getChildren()) {
                                             if (child.getKey().equals(authResult.getUser().getUid())) {
-                                                artistUser = child.getValue(ArtistUser.class);
+                                                if (child.getValue(BaseUser.class).getType().equals(Common.ARTIST_STRING)) {
+                                                    artistUser = child.getValue(ArtistUser.class);
+                                                } else {
+                                                    normalUser = child.getValue(NormalUser.class);
+                                                }
                                             }
                                         }
                                         if (artistUser != null) {
                                             Log.d(TAG, "onDataChange: USER IS ARTIST");
-                                            Common.saveUserData(pM, artistUser.getFrist_name(), artistUser.getLast_name(), artistUser.getEmail(), artistUser.getPassword(), artistUser.getPhone(), artistUser.getType(), artistUser.getMore_details());
+                                            Common.saveUserData(pM, artistUser.getFull_name(), artistUser.getEmail(), artistUser.getPassword(), artistUser.getPhone(), artistUser.getType(), artistUser.getMore_details());
                                             hideDialog(dialog);
                                             // TODO: Check email validation
                                             if (authResult.getUser().isEmailVerified()) {
@@ -215,43 +220,26 @@ public class LoginActivity extends BaseActivity implements
 
                                         } else {
                                             Log.d(TAG, "onDataChange: USER NOT ARTIST");
-                                            normal_users_ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                    NormalUser normalUser = null;
-                                                    for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                                        if (child.getKey().equals(authResult.getUser().getUid())) {
-                                                            normalUser = child.getValue(NormalUser.class);
-                                                        }
-                                                    }
-                                                    if (normalUser != null) {
-                                                        Log.d(TAG, "onDataChange: USER IS NORMAL USER");
-                                                        Common.saveUserData(pM, normalUser.getFrist_name(), normalUser.getLast_name(), normalUser.getEmail(), normalUser.getPassword(), normalUser.getPhone(), normalUser.getType(), null);
-                                                        hideDialog(dialog);
-                                                        // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
-                                                        // TODO : check email validation
-                                                        if (authResult.getUser().isEmailVerified()) { // verified go home
-                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED!");
-                                                            startActivity(new Intent(LoginActivity.this, WizardActivity.class));
-                                                            finish();
-                                                        } else // not verified show verification fragment
-                                                        {
-                                                            Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED");
-                                                            showEmailVerificationFragment();
-                                                        }
-                                                    } else {
-                                                        Log.d(TAG, "onDataChange: USER IS NOT NORMAL USER & NOT EXIST !");
-                                                        hideDialog(dialog);
-                                                        showShortMessage("This User No Longer Exist!", findViewById(android.R.id.content));
-                                                    }
+                                            if (normalUser != null) {
+                                                Log.d(TAG, "onDataChange: USER IS NORMAL USER");
+                                                Common.saveUserData(pM, normalUser.getFull_name(), normalUser.getEmail(), normalUser.getPassword(), normalUser.getPhone(), normalUser.getType(), null);
+                                                hideDialog(dialog);
+                                                // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
+                                                // TODO : check email validation
+                                                if (authResult.getUser().isEmailVerified()) { // verified go home
+                                                    Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS VERIFIED!");
+                                                    startActivity(new Intent(LoginActivity.this, WizardActivity.class));
+                                                    finish();
+                                                } else // not verified show verification fragment
+                                                {
+                                                    Log.d(TAG, "onDataChange: SIGNED IN USER EMAIL IS NOT VERIFIED");
+                                                    showEmailVerificationFragment();
                                                 }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-                                                    Log.d(TAG, "onCancelled: " + databaseError.getMessage());
-                                                    hideDialog(dialog);
-                                                }
-                                            });
+                                            } else {
+                                                Log.d(TAG, "onDataChange: USER IS NOT NORMAL USER & NOT EXIST !");
+                                                hideDialog(dialog);
+                                                showShortMessage("This User No Longer Exist!", findViewById(android.R.id.content));
+                                            }
                                         }
                                     }
 
@@ -329,24 +317,19 @@ public class LoginActivity extends BaseActivity implements
     }
 
     @Override
-    public void onRegisterNextBtnClicked(final String first_name, final String last_name, final String email, final String phone, final String password, final int TYPE) {
+    public void onRegisterNextBtnClicked(final String full_name, final String email, final String phone, final String password, final int TYPE) {
         Log.d(TAG, "onRegisterNextBtnClicked: ");
 
         showDialog();
 
         final String type_u;
-        final DatabaseReference ref;
 
         if (TYPE == NORMAL_USER)  // USER REGISTER
         {
             type_u = NORMAL_USER_STRING;
-            ref = normal_users_ref;
-            Log.d(TAG, "onRegisterNextBtnClicked: 1");
-
         } else // ARTIST REGISTER
         {
             type_u = ARTIST_STRING;
-            ref = artist_users_ref;
         }
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -354,55 +337,91 @@ public class LoginActivity extends BaseActivity implements
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
-                            public void onSuccess(AuthResult authResult) {
+                            public void onSuccess(final AuthResult authResult) {
                                 // save user to firebase db
 
-                                final BaseUser user = new NormalUser();
-                                user.setFrist_name(first_name);
-                                user.setLast_name(last_name);
-                                user.setPhone(phone);
-                                user.setEmail(email);
-                                user.setPassword(password);
-                                user.setType(type_u);
+                                users.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                final String userId = authResult.getUser().getUid();
-                                String token_id = FirebaseInstanceId.getInstance().getToken();
+                                        final String username = StringManipulation.condenseUsername(full_name);
+                                        final BaseUser user = new BaseUser();
+                                        if (!checkIfUsernameExists(username, dataSnapshot)) {
+                                            user.setUser_name(username);
+                                        } else {
+                                            user.setUser_name(username + mDatabase.push().getKey().substring(3, 7));
+                                        }
+                                        user.setFull_name(full_name);
+                                        user.setPhone(phone);
+                                        user.setEmail(email);
+                                        user.setPassword(password);
 
-                                Log.d(TAG, "onShareSuccess:Register UID = " + userId);
-                                Log.d(TAG, "onShareSuccess:Register TID = " + token_id);
-                                // use uid as key of childs
-                                ref.child(authResult.getUser().getUid())
-                                        .setValue(user)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                hideDialog(dialog);
-                                                Log.d(TAG, "onShareSuccess:Register added to db 1.1 ");
-                                                //
-                                                if (TextUtils.equals(type_u, NORMAL_USER_STRING)) { // normal user register done
-                                                    showShortMessage("Registration finished, login now", findViewById(android.R.id.content));
-                                                    showShortMessage("Registration Success", findViewById(android.R.id.content));
-                                                    while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                                                        getSupportFragmentManager().popBackStackImmediate();
+
+                                        user.setType(type_u);
+
+                                        final String userId = authResult.getUser().getUid();
+                                        String token_id = FirebaseInstanceId.getInstance().getToken();
+
+                                        Log.d(TAG, "onShareSuccess:Register UID = " + userId);
+                                        Log.d(TAG, "onShareSuccess:Register TID = " + token_id);
+
+
+                                        //TODO: // use uid as key of childs   // add new user to database
+                                        users.child(userId)
+                                                .setValue(user)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        hideDialog(dialog);
+                                                        Log.d(TAG, "onShareSuccess:Register added to db 1.1 ");
+
+                                                        // add new user account settings to the database
+                                                        UserAccountSettings settings = new UserAccountSettings();
+                                                        settings.setDescription("Hey, i am new to Bella.");
+                                                        settings.setUser_name(user.getUser_name());
+                                                        settings.setFollowers(0);
+                                                        settings.setFollowing(0);
+                                                        settings.setPosts(0);
+                                                        settings.setDisplay_name(username);
+                                                        settings.setWebsite("");
+                                                        settings.setId(userId);
+                                                        settings.setProfile_photo("");
+
+                                                        mDatabase.child(Common.USER_ACCOUNT_SETTINGS).child(userId).setValue(settings);
+
+                                                        if (TextUtils.equals(type_u, NORMAL_USER_STRING)) { // normal user register done
+                                                            while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                                                                getSupportFragmentManager().popBackStackImmediate();
+                                                            }
+                                                            showLoginFragment();
+                                                        } else { // artist user register done
+                                                            showArtistQuestionsFragment(userId, user);
+                                                        }
+
+                                                        sendEmailVerfication();
                                                     }
-                                                    showLoginFragment();
-                                                } else { // artist user register done
-                                                    showArtistQuestionsFragment(userId, user);
-                                                }
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                hideDialog(dialog);
-                                                Log.d(TAG, "onShareFailure:Register Saving to db : 1.2" + e.getMessage());
-                                                if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
-                                                    showShortMessage("Check network connection!", findViewById(android.R.id.content));
-                                                } else {
-                                                    showShortMessage("Check log for error", findViewById(android.R.id.content));
-                                                }
-                                            }
-                                        });
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        hideDialog(dialog);
+                                                        Log.d(TAG, "onShareFailure:Register Saving to db : 1.2" + e.getMessage());
+                                                        if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
+                                                            showShortMessage("Check network connection!", findViewById(android.R.id.content));
+                                                        } else {
+                                                            showShortMessage("Check log for error", findViewById(android.R.id.content));
+                                                        }
+                                                    }
+                                                });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Log.d(TAG, "onCancelled: ");
+                                    }
+                                });
+
+
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -424,6 +443,25 @@ public class LoginActivity extends BaseActivity implements
         }, Common.LOADING_DURATION);
     }
 
+    public boolean checkIfUsernameExists(String username, DataSnapshot datasnapshot) {
+        Log.d(TAG, "checkIfUsernameExists: checking if " + username + " already exists.");
+        Log.d(TAG, "checkIfUsernameExists: datasnapshot = " + datasnapshot);
+        BaseUser user = new BaseUser();
+
+        for (DataSnapshot ds : datasnapshot.getChildren()) {
+            Log.d(TAG, "checkIfUsernameExists: datasnapshot: " + ds);
+
+            user.setUser_name(ds.getValue(BaseUser.class).getUser_name());
+            Log.d(TAG, "checkIfUsernameExists: username: " + user.getUser_name() + " given username " + username);
+
+            if (user.getUser_name().equals(username)) {
+                Log.d(TAG, "checkIfUsernameExists: FOUND A MATCH: " + user.getUser_name());
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void showArtistQuestionsFragment(String user_id, BaseUser user) {
         while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
@@ -431,8 +469,7 @@ public class LoginActivity extends BaseActivity implements
         }
         Bundle b = new Bundle();
         b.putString("uid", user_id);
-        b.putString("user_first_name", user.getFrist_name());
-        b.putString("user_last_name", user.getLast_name());
+        b.putString("user_first_name", user.getFull_name());
         b.putString("user_phone", user.getPhone());
         b.putString("user_email", user.getEmail());
         Fragment f = new ArtistQuestionsFragment();
@@ -460,7 +497,7 @@ public class LoginActivity extends BaseActivity implements
                 @Override
                 public void run() {
                     MoreDetailsUserArtist artist_details = new MoreDetailsUserArtist(city, i + "");
-                    artist_users_ref.child(UID).child("more_details").setValue(artist_details)
+                    users.child(UID).child("more_details").setValue(artist_details)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -580,6 +617,11 @@ public class LoginActivity extends BaseActivity implements
     @Override
     public void onResetPasswordFragmentOpened() {
         Log.d(TAG, "onResetPasswordFragmentOpened: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
