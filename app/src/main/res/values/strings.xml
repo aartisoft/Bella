@@ -48,8 +48,23 @@
     <string name="create_post">Create Post</string>
     <string name="say_something_about_this_photo">Say something about this photo...</string>
     <string name="what_is_on_your_mind">What\'s on your mind?</string>
+
     <string name="edit_profile">Edit Profile</string>
     <string name="sign_out">Sign Out</string>
+    <string name="profile">Profile</string>
+
+    <!-- Intent Extras -->
+    <string name="calling_activity">calling_activity</string>
+    <string name="selected_image">selected_image</string>
+    <string name="selected_bitmap">selected_bitmap</string>
+    <string name="return_to_fragment">return_to_fragment</string>
+    <string name="intent_user">intent_user</string>
+
+    <!-- activity names -->
+    <string name="profile_activity">Profile Activity</string>
+    <string name="search_activity">Search Activity</string>
+    <string name="home_activity">Home Activity</string>
+
 
     <!--  <string-array name="governoments">
         <item>الإسكندرية</item>

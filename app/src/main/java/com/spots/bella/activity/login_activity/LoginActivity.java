@@ -72,6 +72,7 @@ public class LoginActivity extends BaseActivity implements
 
     private boolean isVerficationSent;
     DatabaseReference users;
+    private boolean isSignedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class LoginActivity extends BaseActivity implements
         darkStatusBarSetup(getWindow());
         setContentView(R.layout.activity_login);
         initFirebaseAuth();
+        isSignedIn = false;
     }
 
     private void initFirebaseAuth() {
@@ -101,8 +103,10 @@ public class LoginActivity extends BaseActivity implements
                         // TODO: check mail is valid!
                         if (user.isEmailVerified()) {   // show home
                             Log.d(TAG, "onAuthStateChanged: 3.1 EMAIL IS VERFIED");
-                            startActivity(new Intent(context, WizardActivity.class));
-                            finish();
+                            if (!isSignedIn) {
+                                startActivity(new Intent(context, WizardActivity.class));
+                                finish();
+                            }
                         } else {
                             Log.d(TAG, "onAuthStateChanged: 3.2 USER EMAIL NOT VERIFIED");
                             if (isVerficationSent) {
@@ -158,6 +162,12 @@ public class LoginActivity extends BaseActivity implements
         mAuth.removeAuthStateListener(mFirebaseAuthListener);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isSignedIn = false;
+    }
+
     private void showLoginFragment() {
         Log.d(TAG, "showLoginFragment: ");
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -192,11 +202,13 @@ public class LoginActivity extends BaseActivity implements
                             @Override
                             public void onSuccess(final AuthResult authResult) {
                                 Log.d(TAG, "onShareSuccess: LOGIN");
+                                isSignedIn = true;
                                 users.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         ArtistUser artistUser = null;
                                         NormalUser normalUser = null;
+
                                         for (DataSnapshot child : dataSnapshot.getChildren()) {
                                             if (child.getKey().equals(authResult.getUser().getUid())) {
                                                 if (child.getValue(BaseUser.class).getType().equals(Common.ARTIST_STRING)) {
@@ -206,6 +218,7 @@ public class LoginActivity extends BaseActivity implements
                                                 }
                                             }
                                         }
+
                                         if (artistUser != null) {
                                             Log.d(TAG, "onDataChange: USER IS ARTIST");
                                             Common.saveUserData(pM, artistUser.getFull_name(), artistUser.getEmail(), artistUser.getPassword(), artistUser.getPhone(), artistUser.getType(), artistUser.getMore_details());
@@ -242,12 +255,14 @@ public class LoginActivity extends BaseActivity implements
                                                 showShortMessage("This User No Longer Exist!", findViewById(android.R.id.content));
                                             }
                                         }
+                                        isSignedIn = false;
                                     }
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
                                         Log.d(TAG, "onCancelled: " + databaseError.getMessage());
                                         hideDialog(dialog);
+                                        isSignedIn = false;
                                     }
                                 });
                             }
@@ -255,6 +270,7 @@ public class LoginActivity extends BaseActivity implements
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                isSignedIn = false;
                                 Log.d(TAG, "onShareFailure: LOGIN: msg = " + e.getMessage());
                                 hideDialog(dialog);
                                 if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!

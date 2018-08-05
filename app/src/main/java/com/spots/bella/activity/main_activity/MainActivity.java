@@ -30,6 +30,7 @@ import com.spots.bella.activity.make_post.MakePostActivity;
 import com.spots.bella.activity.messages_activity.MessagesActivity;
 import com.spots.bella.activity.my_reservation_activity.MyReservationActivity;
 import com.spots.bella.activity.post_activity.PostActivity;
+import com.spots.bella.activity.profile.ProfileActivity;
 import com.spots.bella.adapters.MainRecyclerViewAdapter;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.spots.bella.constants.Common.GALLERY_PICK_POST_IMAGE;
 import static com.spots.bella.constants.Common.getStatusBarHeight;
@@ -92,6 +94,15 @@ public class MainActivity extends BaseActivity
 
 
     private void initViews() {
+        View header = navigationView.getHeaderView(0);
+        CircleImageView iv_profile_pic = header.findViewById(R.id.iv_profile);
+        iv_profile_pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mAuth.getCurrentUser() != null)
+                    startActivity(new Intent(context, ProfileActivity.class));
+            }
+        });
         navigationView.setNavigationItemSelectedListener(this);
         swipe_root_content_main.setOnRefreshListener(this);
         //TODO: Init Toolbar
@@ -204,9 +215,9 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode== GALLERY_PICK_POST_IMAGE && resultCode==RESULT_OK&&data!=null){
+        if (requestCode == GALLERY_PICK_POST_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri image_uri = data.getData();
-            startActivity(new Intent(this, MakePostActivity.class).putExtra("post_image",image_uri));
+            startActivity(new Intent(this, MakePostActivity.class).putExtra("post_image", image_uri));
         }
     }
 

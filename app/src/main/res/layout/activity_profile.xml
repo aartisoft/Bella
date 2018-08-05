@@ -6,23 +6,14 @@
     android:orientation="vertical"
     tools:context=".activity.profile.ProfileActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/container"
+        >
 
-        <include layout="@layout/snippet_top_profile_bar" />
+    </FrameLayout>
 
-        <include layout="@layout/layout_center_profile" />
-
-    </LinearLayout>
-
-    <ProgressBar
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:id="@+id/profileProgressBar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        />
 
 </RelativeLayout>
