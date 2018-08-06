@@ -14,8 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,7 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class EditProfileFragment extends BaseFragment {
+public class EditProfileFragment extends BaseFragment implements ConfirmPasswordDialog.OnConfirmPasswordListener {
     private static final String TAG = "EditProfileFragment";
     @BindView(R.id.backArrow)
     ImageView back_arrow;
@@ -272,6 +277,7 @@ public class EditProfileFragment extends BaseFragment {
         Log.d(TAG, "setProfileWidgets: setting widgets with data retrieving from firebase database: " + userSettings.toString());
         Log.d(TAG, "setProfileWidgets: setting widgets with data retrieving from firebase database: " + userSettings.getUser().getEmail());
         Log.d(TAG, "setProfileWidgets: setting widgets with data retrieving from firebase database: " + userSettings.getUser().getPhone());
+        Log.d(TAG, "setProfileWidgets: setting widgets with data retrieving from firebase database: " + mGson.toJson(userSettings));
 
         mUserSettings = userSettings;
         //User user = userSettings.getUser();
@@ -300,56 +306,60 @@ public class EditProfileFragment extends BaseFragment {
      * Retrieves the data contained in the widgets and submits it to the database
      * Before donig so it chekcs to make sure the username chosen is unqiue
      */
-    private void saveProfileSettings(){
+    private void saveProfileSettings() {
         final String displayName = mDisplayName.getText().toString();
         final String username = mUsername.getText().toString();
         final String website = mWebsite.getText().toString();
         final String description = mDescription.getText().toString();
         final String email = mEmail.getText().toString();
-        final long phoneNumber = Long.parseLong(mPhoneNumber.getText().toString());
+        final String phoneNumber = mPhoneNumber.getText().toString();
 
 
-        //case1: if the user made a change to their username
-        if(!mUserSettings.getUser().getUser_name().equals(username)){
-
+//        case1: if the user made a change to their username
+        if (!mUserSettings.getUser().getUser_name().equals(username)) {
             checkIfUsernameExists(username);
         }
         //case2: if the user made a change to their email
-        if(!mUserSettings.getUser().getEmail().equals(email)){
+        if (!mUserSettings.getUser().getEmail().equals(email)) {
 
             // step1) Reauthenticate
             //          -Confirm the password and email
-            ConfirmPasswordDialog dialog = new ConfirmPasswordDialog();
-            dialog.show(getFragmentManager(), getString(R.string.confirm_password_dialog));
-            dialog.setTargetFragment(EditProfileFragment.this, 1);
+            if (Common.isValidEmailForm(mEmail.getText().toString())) {
+                ConfirmPasswordDialog dialog = new ConfirmPasswordDialog();
+                dialog.show(getFragmentManager(), getString(R.string.confirm_password_dialog));
+                dialog.setTargetFragment(EditProfileFragment.this, 1);
+            } else {
+                Toast.makeText(context, "Invalid e-mail address!", Toast.LENGTH_SHORT).show();
+            }
 
 
-            // step2) check if the email already is registered
-            //          -'fetchProvidersForEmail(String email)'
-            // step3) change the email
-            //          -submit the new email to the database and authentication
+//             step2) check if the email already is registered
+//                      -'fetchProvidersForEmail(String email)'
+//             step3) change the email
+//                      -submit the new email to the database and authentication
         }
-
+//
         /**
          * change the rest of the settings that do not require uniqueness
          */
-        if(!mUserSettings.getSettings().getDisplay_name().equals(displayName)){
+        if (!mUserSettings.getSettings().getDisplay_name().equals(displayName)) {
             //update displayname
-            mFirebaseMethods.updateUserAccountSettings(displayName, null, null, 0);
+            updateUserAccountSettings(displayName, null, null, null);
         }
-        if(!mUserSettings.getSettings().getWebsite().equals(website)){
+        if (!mUserSettings.getSettings().getWebsite().equals(website)) {
             //update website
-            mFirebaseMethods.updateUserAccountSettings(null, website, null, 0);
+            updateUserAccountSettings(null, website, null, null);
         }
-        if(!mUserSettings.getSettings().getDescription().equals(description)){
+        if (!mUserSettings.getSettings().getDescription().equals(description)) {
             //update description
-            mFirebaseMethods.updateUserAccountSettings(null, null, description, 0);
+            updateUserAccountSettings(null, null, description, null);
         }
-        if(!mUserSettings.getSettings().getProfile_photo().equals(phoneNumber)){
+        if (!mUserSettings.getSettings().getProfile_photo().equals(phoneNumber)) {
             //update phoneNumber
-            mFirebaseMethods.updateUserAccountSettings(null, null, null, phoneNumber);
+            updateUserAccountSettings(null, null, null, phoneNumber);
         }
     }
+
     private void checkIfUsernameExists(final String username) {
         Log.d(TAG, "checkIfUsernameExists: Checking if  " + username + " already exists.");
 
@@ -362,16 +372,17 @@ public class EditProfileFragment extends BaseFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if(!dataSnapshot.exists()){
+                if (!dataSnapshot.exists()) {
                     //add the username
-                    mFirebaseMethods.updateUsername(username);
+                    updateUsername(username);
                     Toast.makeText(getActivity(), "saved username.", Toast.LENGTH_SHORT).show();
 
                 }
-                for(DataSnapshot singleSnapshot: dataSnapshot.getChildren()){
-                    if (singleSnapshot.exists()){
-                        Log.d(TAG, "checkIfUsernameExists: FOUND A MATCH: " + singleSnapshot.getValue(User.class).getUsername());
+                for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                    if (singleSnapshot.exists()) {
+                        Log.d(TAG, "checkIfUsernameExists: FOUND A MATCH: " + singleSnapshot.getValue(BaseUser.class).getUser_name());
                         Toast.makeText(getActivity(), "That username already exists.", Toast.LENGTH_SHORT).show();
+                        break;
                     }
                 }
             }
@@ -381,6 +392,142 @@ public class EditProfileFragment extends BaseFragment {
 
             }
         });
+    }
+
+    /**
+     * update username in the 'users' node and 'user_account_settings' node
+     *
+     * @param username
+     */
+    public void updateUsername(String username) {
+        Log.d(TAG, "updateUsername: upadting username to: " + username);
+        assert mAuth.getCurrentUser() != null;
+        myRef.child(Common.USER_STRING)
+                .child(mAuth.getCurrentUser().getUid())
+                .child(Common.USER_NAME_FIELD_STRING)
+                .setValue(username);
+
+        myRef.child(Common.USER_ACCOUNT_SETTINGS)
+                .child(userID)
+                .child(Common.USER_NAME_FIELD_STRING)
+                .setValue(username);
+    }
+
+    @Override
+    public void onConfirmPassword(String password) {
+        Log.d(TAG, "onConfirmPassword: got the password: " + password);
+
+        // Get auth credentials from the user for re-authentication. The example below shows
+        // email and password credentials but there are multiple possible providers,
+        // such as GoogleAuthProvider or FacebookAuthProvider.
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(mAuth.getCurrentUser().getEmail(), password);
+
+        ///////////////////// Prompt the user to re-provide their sign-in credentials
+        mAuth.getCurrentUser().reauthenticate(credential)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User re-authenticated.");
+
+                            ///////////////////////check to see if the email is not already present in the database
+                            mAuth.fetchProvidersForEmail(mEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<ProviderQueryResult> task) {
+                                    if (task.isSuccessful()) {
+                                        try {
+                                            if (task.getResult().getProviders().size() == 1) {
+                                                Log.d(TAG, "onComplete: that email is already in use.");
+                                                Toast.makeText(getActivity(), "That email is already in use", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.d(TAG, "onComplete: That email is available.");
+
+                                                //////////////////////the email is available so update it
+                                                mAuth.getCurrentUser().updateEmail(mEmail.getText().toString())
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Log.d(TAG, "User email address updated.");
+                                                                    Toast.makeText(getActivity(), "email updated", Toast.LENGTH_SHORT).show();
+                                                                    updateEmail(mEmail.getText().toString());
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        } catch (NullPointerException e) {
+                                            Log.e(TAG, "onComplete: NullPointerException: " + e.getMessage());
+                                        }
+                                    }
+                                }
+                            });
+
+
+                        } else {
+                            Log.d(TAG, "onComplete: re-authentication failed.");
+                        }
+
+                    }
+                });
+    }
+
+    /**
+     * update the email in the 'user's' node
+     *
+     * @param email
+     */
+    public void updateEmail(String email) {
+        Log.d(TAG, "updateEmail: upadting email to: " + email);
+
+        myRef.child(Common.USER_STRING)
+                .child(userID)
+                .child(Common.USER_STRING)
+                .setValue(email);
+
+    }
+
+
+    /**
+     * Update 'user_account_settings' node for the current user
+     *
+     * @param displayName
+     * @param website
+     * @param description
+     * @param phoneNumber
+     */
+    public void updateUserAccountSettings(String displayName, String website, String description, String phoneNumber) {
+
+        Log.d(TAG, "updateUserAccountSettings: updating user account settings.");
+
+        if (displayName != null) {
+            myRef.child(Common.USER_ACCOUNT_SETTINGS)
+                    .child(userID)
+                    .child(Common.USER_NAME_FIELD_STRING)
+                    .setValue(displayName);
+        }
+
+
+        if (website != null) {
+            myRef.child(Common.USER_ACCOUNT_SETTINGS)
+                    .child(userID)
+                    .child(Common.STRING_WEBSITE_FIELD)
+                    .setValue(website);
+        }
+
+        if (description != null) {
+            myRef.child(Common.USER_ACCOUNT_SETTINGS)
+                    .child(userID)
+                    .child(Common.STRING_USER_DESCRIPTION)
+                    .setValue(description);
+        }
+
+        if (phoneNumber != null) { /*UPDATE PHONE NUMBER IF CHANGED IN THE USER DATA 'user'*/
+            myRef.child(Common.USER_STRING)
+                    .child(userID)
+                    .child(Common.PHONE_STRING)
+                    .setValue(phoneNumber);
+        }
     }
 
 }

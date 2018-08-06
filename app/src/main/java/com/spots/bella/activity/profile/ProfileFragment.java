@@ -131,7 +131,7 @@ public class ProfileFragment extends BaseFragment {
 
         //User user = userSettings.getUser();
         UserAccountSettings settings = userSettings.getSettings();
-
+        assert settings != null;
         Glide.with(context).load(((settings.getProfile_photo() == null ? R.drawable.ic_profile : settings.getProfile_photo()))).into(mProfilePhoto);
 
         mDisplayName.setText(settings.getDisplay_name());

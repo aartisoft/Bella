@@ -25,6 +25,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.spots.bella.R;
@@ -221,14 +223,14 @@ public class LoginActivity extends BaseActivity implements
 
                                         if (artistUser != null) {
                                             Log.d(TAG, "onDataChange: USER IS ARTIST");
-                                            Common.saveUserData(pM, artistUser.getFull_name(), artistUser.getEmail(), artistUser.getPassword(), artistUser.getPhone(), artistUser.getType(), artistUser.getMore_details());
+                                            Common.saveUserData(pM, artistUser.getFull_name(), artistUser.getEmail(), artistUser.getPassword(), String.valueOf(artistUser.getPhone()), artistUser.getType(), artistUser.getMore_details());
                                             hideDialog(dialog);
                                             // TODO: Check email validation
                                             if (authResult.getUser().isEmailVerified()) {
                                                 startActivity(new Intent(LoginActivity.this, WizardActivity.class));
                                                 finish();
                                             } else {
-                                                mAuth.signOut();
+//                                                mAuth.signOut();
                                                 showEmailVerificationFragment();
                                             }
 
@@ -236,7 +238,7 @@ public class LoginActivity extends BaseActivity implements
                                             Log.d(TAG, "onDataChange: USER NOT ARTIST");
                                             if (normalUser != null) {
                                                 Log.d(TAG, "onDataChange: USER IS NORMAL USER");
-                                                Common.saveUserData(pM, normalUser.getFull_name(), normalUser.getEmail(), normalUser.getPassword(), normalUser.getPhone(), normalUser.getType(), null);
+                                                Common.saveUserData(pM, normalUser.getFull_name(), normalUser.getEmail(), normalUser.getPassword(), String.valueOf(normalUser.getPhone()), normalUser.getType(), null);
                                                 hideDialog(dialog);
                                                 // if user use validated email - or not lw not hwdii 3latool 3la fragment checkValidation
                                                 // TODO : check email validation
@@ -363,73 +365,15 @@ public class LoginActivity extends BaseActivity implements
 
                                         final String username = StringManipulation.condenseUsername(full_name);
                                         final BaseUser user = new BaseUser();
-                                        if (!checkIfUsernameExists(username, dataSnapshot)) {
-                                            user.setUser_name(username);
-                                        } else {
-                                            user.setUser_name(username + mDatabase.push().getKey().substring(3, 7));
-                                        }
                                         user.setFull_name(full_name);
                                         user.setPhone(phone);
                                         user.setEmail(email);
                                         user.setPassword(password);
-
-
                                         user.setType(type_u);
+                                        user.setUser_name(username);
 
-                                        final String userId = authResult.getUser().getUid();
-                                        String token_id = FirebaseInstanceId.getInstance().getToken();
+                                        checkIfUsernameExists(user);
 
-                                        Log.d(TAG, "onShareSuccess:Register UID = " + userId);
-                                        Log.d(TAG, "onShareSuccess:Register TID = " + token_id);
-
-
-                                        //TODO: // use uid as key of childs   // add new user to database
-                                        users.child(userId)
-                                                .setValue(user)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        hideDialog(dialog);
-                                                        Log.d(TAG, "onShareSuccess:Register added to db 1.1 ");
-
-                                                        // add new user account settings to the database
-                                                        UserAccountSettings settings = new UserAccountSettings();
-                                                        settings.setDescription("Hey, i am new to Bella.");
-                                                        settings.setUser_name(user.getUser_name());
-                                                        settings.setFollowers(0);
-                                                        settings.setFollowing(0);
-                                                        settings.setPosts(0);
-                                                        settings.setDisplay_name(username);
-                                                        settings.setWebsite("");
-                                                        settings.setId(userId);
-                                                        settings.setProfile_photo("");
-
-                                                        mDatabase.child(Common.USER_ACCOUNT_SETTINGS).child(userId).setValue(settings);
-
-                                                        if (TextUtils.equals(type_u, NORMAL_USER_STRING)) { // normal user register done
-                                                            while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                                                                getSupportFragmentManager().popBackStackImmediate();
-                                                            }
-                                                            sendEmailVerfication();
-                                                            showLoginFragment();
-                                                        } else { // artist user register done
-                                                            showArtistQuestionsFragment(userId, user);
-                                                        }
-
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        hideDialog(dialog);
-                                                        Log.d(TAG, "onShareFailure:Register Saving to db : 1.2" + e.getMessage());
-                                                        if (e.getMessage().contains("network error")) {   // EMAIL ALREADY USED!
-                                                            showShortMessage("Check network connection!", findViewById(android.R.id.content));
-                                                        } else {
-                                                            showShortMessage("Check log for error", findViewById(android.R.id.content));
-                                                        }
-                                                    }
-                                                });
                                     }
 
                                     @Override
@@ -460,25 +404,73 @@ public class LoginActivity extends BaseActivity implements
         }, Common.LOADING_DURATION);
     }
 
-    public boolean checkIfUsernameExists(String username, DataSnapshot datasnapshot) {
-        Log.d(TAG, "checkIfUsernameExists: checking if " + username + " already exists.");
-        Log.d(TAG, "checkIfUsernameExists: datasnapshot = " + datasnapshot);
-        BaseUser user = new BaseUser();
+    /**
+     * Check is @param username already exists in teh database
+     *
+     * @param user
+     */
+    private void checkIfUsernameExists(final BaseUser user) {
+        Log.d(TAG, "checkIfUsernameExists: Checking if  " + user.getUser_name() + " already exists.");
 
-        for (DataSnapshot ds : datasnapshot.getChildren()) {
-            Log.d(TAG, "checkIfUsernameExists: datasnapshot: " + ds);
+        Query query = mDatabase
+                .child(Common.USER_STRING)
+                .orderByChild(Common.USER_NAME_FIELD_STRING)
+                .equalTo(user.getUser_name());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                assert mAuth.getCurrentUser() != null;
+                String append = "";
+                for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                    if (singleSnapshot.exists()) {
+                        Log.d(TAG, "checkIfUsernameExists: FOUND A MATCH: " + singleSnapshot.getValue(BaseUser.class).getUser_name());
+                        append = users.push().getKey().substring(3, 10);
+                        Log.d(TAG, "onDataChange: username already exists. Appending random string to name: " + append);
+                    }
+                }
 
-            user.setUser_name(ds.getValue(BaseUser.class).getUser_name());
-            Log.d(TAG, "checkIfUsernameExists: username: " + user.getUser_name() + " given username " + username);
+                String mUsername = "";
+                mUsername = user.getUser_name() + append;
 
-            if (user.getUser_name().equals(username)) {
-                Log.d(TAG, "checkIfUsernameExists: FOUND A MATCH: " + user.getUser_name());
-                return true;
+                //add new user to the database
+                user.setUser_name(mUsername);
+
+                //TODO: // use uid as key of childs   // add new user to database
+                users.child(mAuth.getCurrentUser().getUid()).setValue(user);
+
+                // add new user account settings to the database
+                UserAccountSettings settings = new UserAccountSettings();
+                settings.setDescription("Hey, i am new to Bella.");
+                settings.setUser_name(user.getUser_name());
+                settings.setFollowers(0);
+                settings.setFollowing(0);
+                settings.setPosts(0);
+                settings.setDisplay_name(user.getUser_name());
+                settings.setWebsite("");
+                settings.setId(mAuth.getUid());
+                settings.setProfile_photo("");
+
+                mDatabase.child(Common.USER_ACCOUNT_SETTINGS).child(mAuth.getCurrentUser().getUid()).setValue(settings); // add user settings
+                mAuth.signOut();
+
+                if (TextUtils.equals(user.getType(), NORMAL_USER_STRING)) { // normal user register done
+                    while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                        getSupportFragmentManager().popBackStackImmediate();
+                    }
+                    sendEmailVerfication();
+                    showLoginFragment();
+                } else { // artist user register done
+                    showArtistQuestionsFragment(mAuth.getUid(), user);
+                }
             }
-        }
-        return false;
-    }
 
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     private void showArtistQuestionsFragment(String user_id, BaseUser user) {
         while (getSupportFragmentManager().getBackStackEntryCount() > 0) {

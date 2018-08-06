@@ -40,6 +40,9 @@ public class Common {
     public static final String STRING_PHOTOS = "photos";
     public static final String USER_ACCOUNT_SETTINGS = "user_account_settings";
     public static final String USER_NAME_FIELD_STRING = "user_name";
+    public static final String STRING_WEBSITE_FIELD = "website";
+    public static final String STRING_USER_DESCRIPTION = "description";
+    public static final String PHONE_STRING = "phone";
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {

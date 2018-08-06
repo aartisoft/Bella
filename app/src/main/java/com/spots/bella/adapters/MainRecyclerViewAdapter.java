@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.spots.bella.R;
+import com.spots.bella.activity.Share.ShareActivity;
 import com.spots.bella.activity.main_activity.MPresenter;
 import com.spots.bella.activity.make_post.MakePostActivity;
 import com.spots.bella.constants.Common;
@@ -102,7 +103,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             holder.header_photos.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Common.openGallery(context, GALLERY_PICK_POST_IMAGE);
+                    context.startActivity(new Intent(context, ShareActivity.class));
+//                    Common.openGallery(context, GALLERY_PICK_POST_IMAGE);
                     Toast.makeText(context, "Header photos", Toast.LENGTH_SHORT).show();
                 }
             });
