@@ -2,6 +2,7 @@ package com.spots.bella.activity.Share;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -18,16 +19,23 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.spots.bella.R;
+import com.spots.bella.activity.make_post.MakePostActivity;
 import com.spots.bella.activity.profile.AccountSettingsActivity;
+import com.spots.bella.activity.profile.GridImageAdapter;
+import com.spots.bella.di.BaseFragment;
+import com.spots.bella.utils.FilePaths;
+import com.spots.bella.utils.FileSearch;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 /**
  * Created by User on 5/28/2017.
  */
 
-public class GalleryFragment extends Fragment {
+public class GalleryFragment extends BaseFragment {
     private static final String TAG = "GalleryFragment";
 
 
@@ -70,140 +78,118 @@ public class GalleryFragment extends Fragment {
 
 
         TextView nextScreen = (TextView) view.findViewById(R.id.tvNext);
-//        nextScreen.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "onClick: navigating to the final share screen.");
-//
-//                if(isRootTask()){
-//                    Intent intent = new Intent(getActivity(), NextActivity.class);
-//                    intent.putExtra(getString(R.string.selected_image), mSelectedImage);
-//                    startActivity(intent);
-//                }else{
+        nextScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: navigating to the final share screen.");
+
+//                if (isRootTask()) {
+                Intent intent = new Intent(getActivity(), MakePostActivity.class);
+                intent.putExtra(getString(R.string.selected_image), mSelectedImage);
+                startActivity(intent);
+//                } else {
 //                    Intent intent = new Intent(getActivity(), AccountSettingsActivity.class);
 //                    intent.putExtra(getString(R.string.selected_image), mSelectedImage);
-//                    intent.putExtra(getString(R.string.return_to_fragment), getString(R.string.edit_profile_fragment));
+//                    intent.putExtra(getString(R.string.return_to_fragment), getString(R.string.edit_profile));
 //                    startActivity(intent);
 //                    getActivity().finish();
 //                }
+
+            }
+        });
 //
-//            }
-//        });
-//
-//        init();
+        init();
 
         return view;
     }
-//
-//    private boolean isRootTask(){
-//        if(((ShareActivity)getActivity()).getTask() == 0){
-//            return true;
-//        }
-//        else{
-//            return false;
-//        }
-//    }
-//
-//    private void init(){
-//        FilePaths filePaths = new FilePaths();
-//
-//        //check for other folders indide "/storage/emulated/0/pictures"
-//        if (FileSearch.getDirectoryPaths(filePaths.PICTURES) != null) {
-//            directories = FileSearch.getDirectoryPaths(filePaths.PICTURES);
-//        }
-//        directories.add(filePaths.CAMERA);
-//
-//        ArrayList<String> directoryNames = new ArrayList<>();
-//        for (int i = 0; i < directories.size(); i++) {
-//            Log.d(TAG, "init: directory: " + directories.get(i));
-//            int index = directories.get(i).lastIndexOf("/");
-//            String string = directories.get(i).substring(index);
-//            directoryNames.add(string);
-//        }
-//
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-//                android.R.layout.simple_spinner_item, directoryNames);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        directorySpinner.setAdapter(adapter);
-//
-//        directorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                Log.d(TAG, "onItemClick: selected: " + directories.get(position));
-//
-//                //setup our image grid for the directory chosen
-//                setupGridView(directories.get(position));
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-//    }
-//
-//
-//    private void setupGridView(String selectedDirectory){
-//        Log.d(TAG, "setupGridView: directory chosen: " + selectedDirectory);
-//        final ArrayList<String> imgURLs = FileSearch.getFilePaths(selectedDirectory);
-//
-//        //set the grid column width
-//        int gridWidth = getResources().getDisplayMetrics().widthPixels;
-//        int imageWidth = gridWidth/NUM_GRID_COLUMNS;
-//        gridView.setColumnWidth(imageWidth);
-//
-//        //use the grid adapter to adapter the images to gridview
-//        GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview, mAppend, imgURLs);
-//        gridView.setAdapter(adapter);
-//
-//        //set the first image to be displayed when the activity fragment view is inflated
-//        try{
+
+
+    private boolean isRootTask() {
+        if (((ShareActivity) getActivity()).getTask() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //
+    private void init() {
+        FilePaths filePaths = new FilePaths();
+
+        //check for other folders indide "/storage/emulated/0/pictures"
+        if (FileSearch.getDirectoryPaths(filePaths.PICTURES) != null) {
+            directories = FileSearch.getDirectoryPaths(filePaths.PICTURES);
+        }
+        directories.add(filePaths.CAMERA);
+
+        ArrayList<String> directoryNames = new ArrayList<>();
+        for (int i = 0; i < directories.size(); i++) {
+            Log.d(TAG, "init: directory: " + directories.get(i));
+            int index = directories.get(i).lastIndexOf("/");
+            String string = directories.get(i).substring(index);
+            directoryNames.add(string);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, directoryNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        directorySpinner.setAdapter(adapter);
+
+        directorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemClick: selected: " + directories.get(position));
+
+                //setup our image grid for the directory chosen
+                setupGridView(directories.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+
+    private void setupGridView(String selectedDirectory) {
+        Log.d(TAG, "setupGridView: directory chosen: " + selectedDirectory);
+        final ArrayList<String> imgURLs = FileSearch.getFilePaths(selectedDirectory);
+
+        //set the grid column width
+        int gridWidth = getResources().getDisplayMetrics().widthPixels;
+        int imageWidth = gridWidth / NUM_GRID_COLUMNS;
+        gridView.setColumnWidth(imageWidth);
+
+        //use the grid adapter to adapter the images to gridview
+        GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview, mAppend, imgURLs);
+        gridView.setAdapter(adapter);
+
+        //set the first image to be displayed when the activity fragment view is inflated
+        try {
+            Glide.with(context).load(imgURLs.get(0)).into(galleryImage);
 //            setImage(imgURLs.get(0), galleryImage, mAppend);
-//            mSelectedImage = imgURLs.get(0);
-//        }catch (ArrayIndexOutOfBoundsException e){
-//            Log.e(TAG, "setupGridView: ArrayIndexOutOfBoundsException: " +e.getMessage() );
-//        }
-//
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Log.d(TAG, "onItemClick: selected an image: " + imgURLs.get(position));
-//
+            mSelectedImage = imgURLs.get(0);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Log.e(TAG, "setupGridView: ArrayIndexOutOfBoundsException: " + e.getMessage());
+        }
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.d(TAG, "onItemClick: selected an image: " + imgURLs.get(position));
+                Log.d(TAG, "onItemClick: urls : " + mGson.toJson(imgURLs));
+
 //                setImage(imgURLs.get(position), galleryImage, mAppend);
-//                mSelectedImage = imgURLs.get(position);
-//            }
-//        });
-//
-//    }
-//
-//
-//    private void setImage(String imgURL, ImageView image, String append){
-//        Log.d(TAG, "setImage: setting image");
-//
-//        ImageLoader imageLoader = ImageLoader.getInstance();
-//
-//        imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
-//            @Override
-//            public void onLoadingStarted(String imageUri, View view) {
-//                mProgressBar.setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-//                mProgressBar.setVisibility(View.INVISIBLE);
-//            }
-//
-//            @Override
-//            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-//                mProgressBar.setVisibility(View.INVISIBLE);
-//            }
-//
-//            @Override
-//            public void onLoadingCancelled(String imageUri, View view) {
-//                mProgressBar.setVisibility(View.INVISIBLE);
-//            }
-//        });
-//    }
+                Glide.with(context).load(imgURLs.get(position)).into(galleryImage);
+                mSelectedImage = imgURLs.get(position);
+            }
+        });
+
+    }
+
+
 }
 
 

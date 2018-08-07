@@ -6,7 +6,7 @@ import android.net.Uri;
 interface MakePostPresenter {
     void onSharePostClicked(String text);
 
-    void onSharePostClicked(String text, Uri imageUri, int image_count);
+    void onSharePostClicked(String text, String imageUri, int image_count);
 
     void onDestroy();
 

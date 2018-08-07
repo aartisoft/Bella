@@ -30,7 +30,7 @@ public class MakePostPresenterIMP implements MakePostPresenter, OnSharePostRespo
     }
 
     @Override
-    public void onSharePostClicked(String text, Uri imageUri, int image_count) {
+    public void onSharePostClicked(String text, String imageUri, int image_count) {
         if (mView != null) {
             mInteractor.sharePost(this, text, imageUri, image_count);
         }

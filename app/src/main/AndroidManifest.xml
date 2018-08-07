@@ -9,9 +9,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 
     <application
@@ -25,8 +25,8 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activity.Share.ShareActivity"
 
+            android:name=".activity.login_activity.LoginActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -39,8 +39,8 @@
         <activity
             android:name=".activity.main_activity.MainActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
 
             />
         <activity
@@ -59,12 +59,9 @@
         <activity android:name=".activity.post_activity.PostActivity" />
         <activity android:name=".activity.artist_offers_activity.ArtistOffersActivity" />
         <activity android:name=".activity.make_post.MakePostActivity" />
-        <activity android:name=".activity.profile.ProfileActivity"></activity>
-        <activity android:name=".activity.profile.AccountSettingsActivity"></activity>
-        <activity
-            android:name=".activity.login_activity.LoginActivity"
-
-            ></activity>
+        <activity android:name=".activity.profile.ProfileActivity" />
+        <activity android:name=".activity.profile.AccountSettingsActivity" />
+        <activity android:name=".activity.Share.ShareActivity" />
     </application>
 
 </manifest>

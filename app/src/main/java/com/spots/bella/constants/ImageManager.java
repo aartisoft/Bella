@@ -2,6 +2,7 @@ package com.spots.bella.constants;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,13 +19,32 @@ public class ImageManager {
 
     private static final String TAG = "ImageManager";
 
-    public static Bitmap getBitmap(Uri url, Context context) {
-        Log.d(TAG, "getBitmap: url " + url);
+    public static Bitmap getBitmap(Uri uri, Context context) {
+        Log.d(TAG, "getBitmap: url " + uri);
         Bitmap bitmap = null;
         try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), url);
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    public static Bitmap getBitmap(String imgUrl) {
+        File imageFile = new File(imgUrl);
+        FileInputStream fis = null;
+        Bitmap bitmap = null;
+        try {
+            fis = new FileInputStream(imageFile);
+            bitmap = BitmapFactory.decodeStream(fis);
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "getBitmap: FileNotFoundException: " + e.getMessage());
+        } finally {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                Log.e(TAG, "getBitmap: FileNotFoundException: " + e.getMessage());
+            }
         }
         return bitmap;
     }

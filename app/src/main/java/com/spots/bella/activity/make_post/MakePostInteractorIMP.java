@@ -40,13 +40,13 @@ class MakePostInteractorIMP implements MakePostInteractor {
     }
 
     @Override
-    public void sharePost(final OnSharePostResponseListener responseListener, final String caption, Uri imageUri, final int image_count) {
-        Log.d(TAG, "sharePost: IMAGE_URI = " + imageUri);
+    public void sharePost(final OnSharePostResponseListener responseListener, final String caption, String imageUrl, final int image_count) {
+        Log.d(TAG, "sharePost: IMAGE_URI = " + imageUrl);
         Log.d(TAG, "sharePost: POST_TEXT = " + caption);
         Log.d(TAG, "sharePost: IMAGE_COUNT = " + image_count);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-        if (imageUri != null) { // POST WITH IMAGE
+        if (imageUrl != null) { // POST WITH IMAGE
 
             // TODO: upload photo
             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -54,7 +54,7 @@ class MakePostInteractorIMP implements MakePostInteractor {
                     .child(Common.FIREBASE_IMAGE_STORAGE + "/" + uid + "/photo" + (image_count + 1));
 
 
-            Bitmap bm = ImageManager.getBitmap(imageUri, context);
+            Bitmap bm = ImageManager.getBitmap(imageUrl);
             byte[] bytes = ImageManager.getBytesFromBitmap(bm, 50);
 
             UploadTask uploadTask = null;

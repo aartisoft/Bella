@@ -217,6 +217,7 @@ public class MainActivity extends BaseActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_PICK_POST_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri image_uri = data.getData();
+            Log.d(TAG, "onActivityResult: uri  -= "+image_uri);
             startActivity(new Intent(this, MakePostActivity.class).putExtra("post_image", image_uri));
         }
     }

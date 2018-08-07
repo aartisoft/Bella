@@ -12,6 +12,6 @@ interface MakePostInteractor {
         void onShareSuccess(String message);
     }
 
-    void sharePost( OnSharePostResponseListener responseListener, String text, Uri imageUri, int image_count);
+    void sharePost( OnSharePostResponseListener responseListener, String text, String imageUrl, int image_count);
 
 }

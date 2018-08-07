@@ -20,23 +20,42 @@
     </LinearLayout>
 
     <ProgressBar
+        android:id="@+id/progress_activity_post"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:progressDrawable="@drawable/custom_progressbar"
-        android:id="@+id/progress_activity_post"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
-    <EditText
-        android:id="@+id/et_activity_make_post"
+
+    <RelativeLayout
+        android:id="@+id/relLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Say something about this photo..." />
+        android:layout_below="@+id/relLayout1"
+        android:background="@drawable/grey_border_bottom">
 
-    <ImageView
-        android:id="@+id/iv_activity_make_post"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/iv_activity_make_post"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="20dp"
+            android:scaleType="centerCrop" />
+
+        <EditText
+            android:id="@+id/et_activity_make_post_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/iv_activity_make_post"
+            android:background="@null"
+            android:hint="Write a description..." />
+
+    </RelativeLayout>
+
+
 </LinearLayout>
