@@ -1,25 +1,17 @@
 package com.spots.bella.activity.profile;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.spots.bella.R;
 
 import java.util.ArrayList;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 /**
@@ -44,7 +36,7 @@ public class GridImageAdapter extends ArrayAdapter<String> {
     }
 
     private static class ViewHolder {
-        SqaureImageView image;
+        SquareImageView image;
     }
 
     @NonNull
@@ -55,7 +47,7 @@ public class GridImageAdapter extends ArrayAdapter<String> {
         if (convertView == null) {
             convertView = mInflater.inflate(layoutResource, parent, false);
             holder = new ViewHolder();
-            holder.image = (SqaureImageView) convertView.findViewById(R.id.gridImageView);
+            holder.image = (SquareImageView) convertView.findViewById(R.id.gridImageView);
 
             convertView.setTag(holder);
         } else {

@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.spots.bella.activity.profile.SqaureImageView
+    <com.spots.bella.activity.profile.SquareImageView
         android:id="@+id/gridImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

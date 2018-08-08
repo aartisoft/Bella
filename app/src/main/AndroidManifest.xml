@@ -60,8 +60,16 @@
         <activity android:name=".activity.artist_offers_activity.ArtistOffersActivity" />
         <activity android:name=".activity.make_post.MakePostActivity" />
         <activity android:name=".activity.profile.ProfileActivity" />
-        <activity android:name=".activity.profile.AccountSettingsActivity" />
-        <activity android:name=".activity.Share.ShareActivity" />
+        <activity
+            android:name=".activity.profile.AccountSettingsActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.Share.ShareActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -447,11 +447,11 @@ public class LoginActivity extends BaseActivity implements
                 settings.setPosts(0);
                 settings.setDisplay_name(user.getUser_name());
                 settings.setWebsite("");
-                settings.setId(mAuth.getUid());
+                settings.setUser_id(mAuth.getUid());
                 settings.setProfile_photo("");
 
                 mDatabase.child(Common.USER_ACCOUNT_SETTINGS).child(mAuth.getCurrentUser().getUid()).setValue(settings); // add user settings
-                mAuth.signOut();
+//                mAuth.signOut();
 
                 if (TextUtils.equals(user.getType(), NORMAL_USER_STRING)) { // normal user register done
                     while (getSupportFragmentManager().getBackStackEntryCount() > 0) {

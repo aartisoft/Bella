@@ -1,5 +1,6 @@
 package com.spots.bella.activity.make_post;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.spots.bella.R;
+import com.spots.bella.activity.Share.ShareActivity;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseActivity;
 
@@ -125,7 +127,7 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
 
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
-            finish();
+            onBackPressed();
             return true;
         } else if (id == R.id.menu_activity_post_share) {
             sharePost();
@@ -140,6 +142,11 @@ public class MakePostActivity extends BaseActivity implements MakePostView {
 //        mPresenter.onSharePostClicked(text);
     }
 
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, ShareActivity.class));
+        finish();
+    }
 
     private void initViews() {
         Log.d(TAG, "initViews: ");

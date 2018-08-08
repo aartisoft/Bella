@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.spots.bella.R;
+import com.spots.bella.activity.Share.ShareActivity;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseFragment;
 import com.spots.bella.models.BaseUser;
@@ -76,11 +77,13 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
 
     //vars
     private UserSettings mUserSettings;
+    ValueEventListener infoEventListener;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_editprofile, container, false);
+        Log.d(TAG, "onCreateView: ");
         unbinder = ButterKnife.bind(this, v);
         setupFirebaseAuth();
         // back arrow
@@ -96,8 +99,10 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
             public void onClick(View v) {
                 Log.d(TAG, "onClick: attempting to save changes.");
                 saveProfileSettings();
+                getActivity().finish();
             }
         });
+
         return v;
     }
 
@@ -134,8 +139,7 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
             }
         };
 
-
-        myRef.addValueEventListener(new ValueEventListener() {
+        infoEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -150,7 +154,8 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        myRef.addValueEventListener(infoEventListener);
     }
 
 
@@ -269,7 +274,9 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Log.d(TAG, "onDestroyView: ");
         unbinder.unbind();
+        myRef.removeEventListener(infoEventListener);
     }
 
 
@@ -282,6 +289,8 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
         mUserSettings = userSettings;
         //User user = userSettings.getUser();
         UserAccountSettings settings = userSettings.getSettings();
+        Log.d(TAG, "setProfileWidgets: mProfilePhoto = " + ((mProfilePhoto == null) ? "NULL" : "NOT NULL"));
+        Log.d(TAG, "setProfileWidgets: mProfilePhoto = " + ((mDisplayName == null) ? "NULL" : "NOT NULL"));
         Glide.with(context).load(settings.getProfile_photo()).into(mProfilePhoto);
         mDisplayName.setText(settings.getDisplay_name());
         mUsername.setText(settings.getUser_name());
@@ -290,16 +299,16 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
         mEmail.setText(userSettings.getUser().getEmail());
         mPhoneNumber.setText(String.valueOf(userSettings.getUser().getPhone()));
 
-//        mChangeProfilePhoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "onClick: changing profile photo");
-//                Intent intent = new Intent(getActivity(), ShareActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //268435456
-//                getActivity().startActivity(intent);
-//                getActivity().finish();
-//            }
-//        });
+        mChangeProfilePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: changing profile photo");
+                Intent intent = new Intent(getActivity(), ShareActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //268435456
+                getActivity().startActivity(intent);
+                getActivity().finish();
+            }
+        });
     }
 
     /**
@@ -307,6 +316,7 @@ public class EditProfileFragment extends BaseFragment implements ConfirmPassword
      * Before donig so it chekcs to make sure the username chosen is unqiue
      */
     private void saveProfileSettings() {
+        Log.d(TAG, "saveProfileSettings: ");
         final String displayName = mDisplayName.getText().toString();
         final String username = mUsername.getText().toString();
         final String website = mWebsite.getText().toString();

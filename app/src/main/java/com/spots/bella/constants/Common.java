@@ -43,6 +43,15 @@ public class Common {
     public static final String STRING_WEBSITE_FIELD = "website";
     public static final String STRING_USER_DESCRIPTION = "description";
     public static final String PHONE_STRING = "phone";
+    public static final String USER_PROFILE_PHOTO_STRING = "profile_photo";
+    public static final String STRING_USER_ID = "user_id";
+    public static final String STRING_PHOTO_ID = "photo_id";
+    public static final String STRING_CAPTION = "caption";
+    public static final String STRING_DATE_CREATED = "date_created";
+    public static final String STRING_TAGS = "tags";
+    public static final String STRING_IMAGE_PATH = "image_path";
+    public static final String STRING_COMMENTS = "comments";
+    public static final String STRING_LIKES = "likes";
 
     public static void darkStatusBarSetup(Window window) {
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT *//*&& Build.VERSION.SDK_INT < Build.VERSION_CODES.M*//*) {

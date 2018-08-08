@@ -3,6 +3,7 @@ package com.spots.bella.activity.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,13 +27,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.spots.bella.PreferenceManager;
 import com.spots.bella.R;
 import com.spots.bella.activity.login_activity.LoginActivity;
 import com.spots.bella.constants.Common;
+import com.spots.bella.constants.ImageManager;
 import com.spots.bella.models.BaseUser;
 import com.spots.bella.models.UserAccountSettings;
 import com.spots.bella.models.UserSettings;
+import com.spots.bella.utils.FilePaths;
 import com.spots.bella.utils.SectionsStatePagerAdapter;
 
 import java.util.ArrayList;
@@ -70,6 +80,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_account_setting);
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
+        myRef = FirebaseDatabase.getInstance().getReference();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -139,37 +150,103 @@ public class AccountSettingsActivity extends AppCompatActivity {
     }
 
 
-    private void getIncomingIntent(){
+    private void getIncomingIntent() {
         Intent intent = getIntent();
 
-       /* if(intent.hasExtra(getString(R.string.selected_image))
-                || intent.hasExtra(getString(R.string.selected_bitmap))){
+        if (intent.hasExtra(getString(R.string.selected_image))
+                || intent.hasExtra(getString(R.string.selected_bitmap))) {
 
             //if there is an imageUrl attached as an extra, then it was chosen from the gallery/photo fragment
             Log.d(TAG, "getIncomingIntent: New incoming imgUrl");
-            if(intent.getStringExtra(getString(R.string.return_to_fragment)).equals(getString(R.string.edit_profile))){
+            if (intent.getStringExtra(getString(R.string.return_to_fragment)).equals(getString(R.string.edit_profile))) {
 
-                if(intent.hasExtra(getString(R.string.selected_image))){
+                if (intent.hasExtra(getString(R.string.selected_image))) {
+                    //set the new profile picture
+                    uploadNewPhoto(intent.getStringExtra(getString(R.string.selected_image)), null);
+                }
+               /* else if (intent.hasExtra(getString(R.string.selected_bitmap))) {
                     //set the new profile picture
                     FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
                     firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, 0,
-                            intent.getStringExtra(getString(R.string.selected_image)), null);
-                }
-                else if(intent.hasExtra(getString(R.string.selected_bitmap))){
-                    //set the new profile picture
-                    FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
-                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, 0,
-                            null,(Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap)));
-                }
-
+                            null, (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap)));
+                }*/
             }
 
-        }*/
+        }
 
-        if(intent.hasExtra(getString(R.string.calling_activity))){
+        if (intent.hasExtra(getString(R.string.calling_activity))) {
             Log.d(TAG, "getIncomingIntent: received incoming intent from " + getString(R.string.profile_activity));
             setViewPager(pagerAdapter.getFragmentNumber(getString(R.string.edit_profile)));
         }
+    }
+
+    double mPhotoUploadProgress = 0;
+
+    public void uploadNewPhoto(final String imgUrl,
+                               Bitmap bm) {
+        Log.d(TAG, "uploadNewPhoto: attempting to uplaod new photo.");
+
+        FilePaths filePaths = new FilePaths();
+        //case1) new photo
+        Log.d(TAG, "uploadNewPhoto: uploading new PROFILE photo");
+
+
+        ((AccountSettingsActivity) mContext).setViewPager(
+                ((AccountSettingsActivity) mContext).pagerAdapter
+                        .getFragmentNumber(mContext.getString(R.string.edit_profile))
+        );
+
+        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference()
+                .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/profile_photo");
+
+        //convert image url to bitmap
+        if (bm == null) {
+            bm = ImageManager.getBitmap(imgUrl);
+        }
+        byte[] bytes = ImageManager.getBytesFromBitmap(bm, 50);
+
+        UploadTask uploadTask = null;
+        uploadTask = storageReference.putBytes(bytes);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri firebaseUrl = taskSnapshot.getDownloadUrl();
+
+                Toast.makeText(mContext, "photo upload success", Toast.LENGTH_SHORT).show();
+
+                //insert into 'user_account_settings' node
+                setProfilePhoto(firebaseUrl.toString());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: Photo upload failed.");
+                Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+
+                if (progress - 15 > mPhotoUploadProgress) {
+                    Toast.makeText(mContext, "photo upload progress: " + String.format("%.0f", progress) + "%", Toast.LENGTH_SHORT).show();
+                    mPhotoUploadProgress = progress;
+                }
+
+                Log.d(TAG, "onProgress: upload progress: " + progress + "% done");
+            }
+        });
+    }
+
+    private void setProfilePhoto(String url) {
+        Log.d(TAG, "setProfilePhoto: setting new profile image: " + url);
+
+        myRef.child(Common.USER_ACCOUNT_SETTINGS)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child(Common.USER_PROFILE_PHOTO_STRING)
+                .setValue(url);
     }
 
 
