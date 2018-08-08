@@ -30,12 +30,12 @@ import com.spots.bella.R;
 import com.spots.bella.constants.Common;
 import com.spots.bella.di.BaseFragment;
 import com.spots.bella.models.BaseUser;
+import com.spots.bella.models.Comment;
 import com.spots.bella.models.Like;
 import com.spots.bella.models.Photo;
 import com.spots.bella.models.UserAccountSettings;
 import com.spots.bella.models.UserSettings;
 
-import org.w3c.dom.Comment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -237,41 +237,41 @@ public class ProfileFragment extends BaseFragment {
                 for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
                     photos.add(singleSnapshot.getValue(Photo.class));
 
-//                    Photo photo = new Photo();
-//                    Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
-//
-//                    try {
-//                        photo.setCaption(objectMap.get(getString(R.string.field_caption)).toString());
-//                        photo.setTags(objectMap.get(getString(R.string.field_tags)).toString());
-//                        photo.setPhoto_id(objectMap.get(getString(R.string.field_photo_id)).toString());
-//                        photo.setUser_id(objectMap.get(getString(R.string.field_user_id)).toString());
-//                        photo.setDate_created(objectMap.get(getString(R.string.field_date_created)).toString());
-//                        photo.setImage_path(objectMap.get(getString(R.string.field_image_path)).toString());
-//
-//                        ArrayList<Comment> comments = new ArrayList<Comment>();
-//                        for (DataSnapshot dSnapshot : singleSnapshot
-//                                .child(getString(R.string.field_comments)).getChildren()) {
-//                            Comment comment = new Comment();
-//                            comment.setUser_id(dSnapshot.getValue(Comment.class).getUser_id());
-//                            comment.setComment(dSnapshot.getValue(Comment.class).getComment());
-//                            comment.setDate_created(dSnapshot.getValue(Comment.class).getDate_created());
-//                            comments.add(comment);
-//                        }
-//
-//                        photo.setComments(comments);
-//
-//                        List<Like> likesList = new ArrayList<Like>();
-//                        for (DataSnapshot dSnapshot : singleSnapshot
-//                                .child(getString(R.string.field_likes)).getChildren()) {
-//                            Like like = new Like();
-//                            like.setUser_id(dSnapshot.getValue(Like.class).getUser_id());
-//                            likesList.add(like);
-//                        }
-//                        photo.setLikes(likesList);
-//                        photos.add(photo);
-//                    } catch (NullPointerException e) {
-//                        Log.e(TAG, "onDataChange: NullPointerException: " + e.getMessage());
-//                    }
+                    Photo photo = new Photo();
+                    Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
+
+                    try {
+                        photo.setCaption(objectMap.get(Common.STRING_CAPTION).toString());
+                        photo.setTags(objectMap.get(Common.STRING_TAGS).toString());
+                        photo.setPhoto_id(objectMap.get(Common.STRING_PHOTO_ID).toString());
+                        photo.setUser_id(objectMap.get(Common.STRING_USER_ID).toString());
+                        photo.setDate_created(objectMap.get(Common.STRING_DATE_CREATED).toString());
+                        photo.setImage_path(objectMap.get(Common.STRING_IMAGE_PATH).toString());
+
+                        ArrayList<Comment> comments = new ArrayList<Comment>();
+                        for (DataSnapshot dSnapshot : singleSnapshot
+                                .child(Common.STRING_COMMENTS).getChildren()) {
+                            Comment comment = new Comment();
+                            comment.setUser_id(dSnapshot.getValue(Comment.class).getUser_id());
+                            comment.setComment(dSnapshot.getValue(Comment.class).getComment());
+                            comment.setDate_created(dSnapshot.getValue(Comment.class).getDate_created());
+                            comments.add(comment);
+                        }
+
+                        photo.setComments(comments);
+
+                        List<Like> likesList = new ArrayList<Like>();
+                        for (DataSnapshot dSnapshot : singleSnapshot
+                                .child(Common.STRING_LIKES).getChildren()) {
+                            Like like = new Like();
+                            like.setUser_id(dSnapshot.getValue(Like.class).getUser_id());
+                            likesList.add(like);
+                        }
+                        photo.setLikes(likesList);
+                        photos.add(photo);
+                    } catch (NullPointerException e) {
+                        Log.e(TAG, "onDataChange: NullPointerException: " + e.getMessage());
+                    }
                 }
 
                 //setup our image grid

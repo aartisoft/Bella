@@ -89,19 +89,19 @@ public class ViewCommentsFragment extends Fragment {
         mContext = getActivity();
 
 
-        try{
+        /*try{
             mPhoto = getPhotoFromBundle();
             setupFirebaseAuth();
 
         }catch (NullPointerException e){
             Log.e(TAG, "onCreateView: NullPointerException: " + e.getMessage() );
         }
-
+*/
 
 
 
         return view;
-    }
+    }/*
 
     private void setupWidgets(){
 
@@ -182,10 +182,10 @@ public class ViewCommentsFragment extends Fragment {
         return sdf.format(new Date());
     }
 
-    /**
+    *//**
      * retrieve the photo from the incoming bundle from profileActivity interface
      * @return
-     */
+     *//*
     private String getCallingActivityFromBundle(){
         Log.d(TAG, "getPhotoFromBundle: arguments: " + getArguments());
 
@@ -197,10 +197,10 @@ public class ViewCommentsFragment extends Fragment {
         }
     }
 
-    /**
+    *//**
      * retrieve the photo from the incoming bundle from profileActivity interface
      * @return
-     */
+     *//*
     private Photo getPhotoFromBundle(){
         Log.d(TAG, "getPhotoFromBundle: arguments: " + getArguments());
 
@@ -212,13 +212,13 @@ public class ViewCommentsFragment extends Fragment {
         }
     }
 
-           /*
+           *//*
     ------------------------------------ Firebase ---------------------------------------------
-     */
+     *//*
 
-    /**
+    *//**
      * Setup the firebase auth object
-     */
+     *//*
     private void setupFirebaseAuth(){
         Log.d(TAG, "setupFirebaseAuth: setting up firebase auth.");
 
@@ -362,7 +362,7 @@ public class ViewCommentsFragment extends Fragment {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-
+*/
 }
 
 

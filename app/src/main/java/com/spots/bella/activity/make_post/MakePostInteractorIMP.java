@@ -68,6 +68,7 @@ class MakePostInteractorIMP implements MakePostInteractor {
                     // add the new photo to 'photo' node and 'user_photos' node
                     // navigate to the main feed so user can see their photo
                     addPhotoToDatabase(caption, image_url, responseListener);
+                    responseListener.onShareSuccess("");
 
                 }
             }).addOnFailureListener(new OnFailureListener() {

@@ -22,9 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.spots.bella.R;
 import com.spots.bella.constants.Common;
 import com.spots.bella.models.Comment;
@@ -39,10 +36,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import tabian.com.instagramclone2.R;
-import tabian.com.instagramclone2.models.Comment;
-import tabian.com.instagramclone2.models.User;
-import tabian.com.instagramclone2.models.UserAccountSettings;
 
 /**
  * Created by User on 8/22/2017.
