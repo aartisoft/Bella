@@ -130,8 +130,6 @@ public class CommentListAdapter extends ArrayAdapter<Comment> {
         } catch (NullPointerException e) {
             Log.e(TAG, "getView: NullPointerException: " + e.getMessage());
         }
-
-
         return convertView;
     }
 

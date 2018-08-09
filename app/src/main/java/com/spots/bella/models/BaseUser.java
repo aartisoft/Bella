@@ -1,7 +1,9 @@
 package com.spots.bella.models;
 
 public class BaseUser {
+
     private String full_name;
+    private String user_id;
     private String user_name;
     private String email;
     private String password;
@@ -9,6 +11,14 @@ public class BaseUser {
     private String type;
 
     public BaseUser() {
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public String getFull_name() {

@@ -234,67 +234,68 @@ public class ProfileFragment extends BaseFragment {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
-                    photos.add(singleSnapshot.getValue(Photo.class));
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                        Log.d(TAG, "onDataChange: dataSnapshot size =  " + dataSnapshot.getChildrenCount());
 
-                    Photo photo = new Photo();
-                    Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
+                        Photo photo = new Photo();
+                        Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
+                        try {
+                            photo.setCaption(objectMap.get(Common.STRING_CAPTION).toString());
+                            photo.setTags(objectMap.get(Common.STRING_TAGS).toString());
+                            photo.setPhoto_id(objectMap.get(Common.STRING_PHOTO_ID).toString());
+                            photo.setUser_id(objectMap.get(Common.STRING_USER_ID).toString());
+                            photo.setDate_created(objectMap.get(Common.STRING_DATE_CREATED).toString());
+                            photo.setImage_path(objectMap.get(Common.STRING_IMAGE_PATH).toString());
 
-                    try {
-                        photo.setCaption(objectMap.get(Common.STRING_CAPTION).toString());
-                        photo.setTags(objectMap.get(Common.STRING_TAGS).toString());
-                        photo.setPhoto_id(objectMap.get(Common.STRING_PHOTO_ID).toString());
-                        photo.setUser_id(objectMap.get(Common.STRING_USER_ID).toString());
-                        photo.setDate_created(objectMap.get(Common.STRING_DATE_CREATED).toString());
-                        photo.setImage_path(objectMap.get(Common.STRING_IMAGE_PATH).toString());
+                            ArrayList<Comment> comments = new ArrayList<Comment>();
+                            for (DataSnapshot dSnapshot : singleSnapshot
+                                    .child(Common.STRING_COMMENTS).getChildren()) {
+                                Comment comment = new Comment();
+                                comment.setUser_id(dSnapshot.getValue(Comment.class).getUser_id());
+                                comment.setComment(dSnapshot.getValue(Comment.class).getComment());
+                                comment.setDate_created(dSnapshot.getValue(Comment.class).getDate_created());
+                                comments.add(comment);
+                            }
 
-                        ArrayList<Comment> comments = new ArrayList<Comment>();
-                        for (DataSnapshot dSnapshot : singleSnapshot
-                                .child(Common.STRING_COMMENTS).getChildren()) {
-                            Comment comment = new Comment();
-                            comment.setUser_id(dSnapshot.getValue(Comment.class).getUser_id());
-                            comment.setComment(dSnapshot.getValue(Comment.class).getComment());
-                            comment.setDate_created(dSnapshot.getValue(Comment.class).getDate_created());
-                            comments.add(comment);
+                            photo.setComments(comments);
+
+                            List<Like> likesList = new ArrayList<Like>();
+                            for (DataSnapshot dSnapshot : singleSnapshot
+                                    .child(Common.STRING_LIKES).getChildren()) {
+                                Like like = new Like();
+                                like.setUser_id(dSnapshot.getValue(Like.class).getUser_id());
+                                likesList.add(like);
+                            }
+                            photo.setLikes(likesList);
+                            photos.add(photo);
+                        } catch (NullPointerException e) {
+                            Log.e(TAG, "onDataChange: NullPointerException: " + e.getMessage());
                         }
+                    }
 
-                        photo.setComments(comments);
+                    //setup our image grid
+                    int gridWidth = getResources().getDisplayMetrics().widthPixels;
+                    int imageWidth = gridWidth / NUM_GRID_COLUMNS;
+                    grideView.setColumnWidth(imageWidth);
 
-                        List<Like> likesList = new ArrayList<Like>();
-                        for (DataSnapshot dSnapshot : singleSnapshot
-                                .child(Common.STRING_LIKES).getChildren()) {
-                            Like like = new Like();
-                            like.setUser_id(dSnapshot.getValue(Like.class).getUser_id());
-                            likesList.add(like);
+                    ArrayList<String> imgUrls = new ArrayList<String>();
+                    for (int i = 0; i < photos.size(); i++) {
+                        imgUrls.add(photos.get(i).getImage_path());
+                    }
+                    GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview,
+                            "", imgUrls);
+                    grideView.setAdapter(adapter);
+
+                    grideView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Log.d(TAG, "onItemClick: poto selected = " + mGson.toJson(photos.get(position)));
+                            mOnGridImageSelectedListener.onGridImageSelected(photos.get(position));
+                            Toast.makeText(context, position + " ", Toast.LENGTH_SHORT).show();
                         }
-                        photo.setLikes(likesList);
-                        photos.add(photo);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "onDataChange: NullPointerException: " + e.getMessage());
-                    }
+                    });
                 }
-
-                //setup our image grid
-                int gridWidth = getResources().getDisplayMetrics().widthPixels;
-                int imageWidth = gridWidth / NUM_GRID_COLUMNS;
-                grideView.setColumnWidth(imageWidth);
-
-                ArrayList<String> imgUrls = new ArrayList<String>();
-                for (int i = 0; i < photos.size(); i++) {
-                    imgUrls.add(photos.get(i).getImage_path());
-                }
-                GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview,
-                        "", imgUrls);
-                grideView.setAdapter(adapter);
-
-                grideView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.d(TAG, "onItemClick: poto selected = " + mGson.toJson(photos.get(position)));
-                        mOnGridImageSelectedListener.onGridImageSelected(photos.get(position));
-                        Toast.makeText(context, position + " ", Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
 
             @Override

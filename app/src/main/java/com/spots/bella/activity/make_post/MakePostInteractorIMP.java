@@ -115,7 +115,7 @@ class MakePostInteractorIMP implements MakePostInteractor {
         photo.setPhoto_id(new_photo_key);
 
         // insert into database
-        databaseReference.child(Common.USER_PHOTOS_STRING).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).push().setValue(photo);
+        databaseReference.child(Common.USER_PHOTOS_STRING).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(new_photo_key).setValue(photo);
         databaseReference.child(Common.STRING_PHOTOS).child(new_photo_key).setValue(photo);
         Log.d(TAG, "addPhotoToDatabase: finish");
 
@@ -124,7 +124,7 @@ class MakePostInteractorIMP implements MakePostInteractor {
     }
 
     public String getTimeStamp() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'z'", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Africa/Cairo"));
 
         return simpleDateFormat.format(new Date());

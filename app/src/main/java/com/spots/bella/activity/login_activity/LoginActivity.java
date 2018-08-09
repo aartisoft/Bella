@@ -370,10 +370,10 @@ public class LoginActivity extends BaseActivity implements
                                         user.setEmail(email);
                                         user.setPassword(password);
                                         user.setType(type_u);
+                                        user.setUser_id(mAuth.getCurrentUser().getUid());
                                         user.setUser_name(username);
 
                                         checkIfUsernameExists(user);
-
                                     }
 
                                     @Override
